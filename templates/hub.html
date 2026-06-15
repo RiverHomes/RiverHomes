@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="hero-copy soft-card hub-intro">
+    <div class="eyebrow">{{ 'Visitor' if role == 'tenant' else 'Landlord' }} mode</div>
+    <h1>Choose what you need.</h1>
+    <p class="lead">The main buttons stay simple, so the site stays easy on phone and desktop.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="hub-grid">
+    {% for card in cards %}
+      <a class="hub-card soft-card" href="{{ card.href }}">
+        <span class="hub-pill">{{ card.key|replace('_', ' ') }}</span>
+        <strong>{{ card.title }}</strong>
+        <small>{{ card.subtitle }}</small>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

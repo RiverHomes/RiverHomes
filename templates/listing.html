@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="listing-detail">
+  <div class="detail-media soft-card">
+    {% if listing.image_url %}
+      <img src="{{ listing.image_url }}" alt="{{ listing.title }}">
+    {% else %}
+      <div class="detail-placeholder">
+        <span>Listing</span>
+        <strong>{{ categories.get(listing.category, listing.category) }}</strong>
+        <p>Replace this with a real uploaded picture when you post a listing.</p>
+      </div>
+    {% endif %}
+    <div class="overlay-tags">
+      <span class="badge {{ listing.status }}">{{ listing.status|replace('_', ' ') }}</span>
+      {% if listing.boosted %}<span class="badge boosted">Boosted</span>{% endif %}
+      {% if listing.is_example %}<span class="badge example">Example</span>{% endif %}
+      {% if expiring_soon %}<span class="badge warning">Renewal due soon</span>{% endif %}
+    </div>
+  </div>
+
+  <div class="detail-copy">
+    <div class="detail-head soft-card">
+      <div>
+        <h1>{{ listing.title }}</h1>
+        <p>{{ listing.county }} · {{ listing.place }}{% if listing.address %} · {{ listing.address }}{% endif %}</p>
+      </div>
+      <div class="detail-price-stack">
+        <strong class="price">KSh {{ "{:,}".format(listing.price) }}</strong>
+        <div class="tiny-actions">
+          <button class="btn secondary" type="button" data-share-page>Share</button>
+          <a class="btn secondary" href="{{ url_for('qr_page', target=request.url) }}">QR</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-line soft-card">
+      <span>{{ listing.interest_count }} interested</span>
+      <span>{{ listing.views }} views</span>
+      <span>Posted {{ listing.created_at.strftime('%d %b %Y') }}</span>
+      <span>Expires {{ listing.expires_at.strftime('%d %b %Y') }}</span>
+    </div>
+
+    <p class="detail-text soft-card">{{ listing.description }}</p>
+
+    <div class="contact-grid">
+      <div class="soft-card contact-card">
+        <h3>Owner / agent</h3>
+        <p><strong>{{ listing.contact_name }}</strong></p>
+        <p>{{ listing.contact_phone }}</p>
+        {% if listing.whatsapp %}
+        <a class="btn secondary full" target="_blank" href="{{ listing.whatsapp }}">Open WhatsApp</a>
+        {% endif %}
+      </div>
+
+      <div class="soft-card contact-card">
+        <h3>Interest actions</h3>
+        <form method="post" class="stack-form">
+          <input name="visitor_name" placeholder="Your name" value="{{ session.get('guest_name','') }}">
+          <input name="visitor_phone" placeholder="Your phone number">
+          <textarea name="message" rows="4" placeholder="Write a short message"></textarea>
+          <button class="btn primary" name="action" value="interest" type="submit">I am interested</button>
+          <div class="tiny-actions">
+            <a class="btn ghost" href="{{ url_for('chat', listing_id=listing.id) }}">Private chat</a>
+            <button class="btn ghost" name="action" value="chat" type="submit">Send message</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if can_manage %}
+    <div class="soft-card owner-actions">
+      <h3>Owner controls</h3>
+      <form method="post" class="inline-actions">
+        <button class="btn secondary" name="action" value="continue" type="submit">Continue for 14 days</button>
+        <button class="btn ghost" name="action" value="pause" type="submit">Pause listing</button>
+        <button class="btn danger" name="action" value="mark_taken" type="submit">Mark as taken</button>
+      </form>
+      <p class="fineprint">Only the landlord can mark the listing as taken.</p>
+    </div>
+
+    <div class="soft-card owner-actions">
+      <h3>Leads and messages</h3>
+      <div class="stack-list">
+        {% for lead in listing.leads %}
+          <div class="stack-item">
+            <strong>{{ lead.visitor_name }}{% if lead.visitor_phone %} · {{ lead.visitor_phone }}{% endif %}</strong>
+            <p>{{ lead.message }}</p>
+            <span>{{ lead.created_at.strftime('%d %b %H:%M') }}</span>
+          </div>
+        {% else %}
+          <p class="muted">No leads yet.</p>
+        {% endfor %}
+      </div>
+      <div class="stack-list">
+        {% for msg in listing.chat_messages %}
+          <div class="stack-item">
+            <strong>{{ msg.sender_name }} · {{ msg.sender_role }}</strong>
+            <p>{{ msg.message }}</p>
+            <span>{{ msg.created_at.strftime('%d %b %H:%M') }}</span>
+          </div>
+        {% else %}
+          <p class="muted">No messages yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="soft-card owner-actions">
+      <h3>What happens next</h3>
+      <p>Send interest, message the owner privately, and wait for review approval before the listing becomes public.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

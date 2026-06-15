@@ -1,0 +1,31 @@
+<a class="listing-card soft-card {% if listing.is_example %}example-card{% endif %}" href="{{ url_for('listing_detail', listing_id=listing.id) }}">
+  <div class="thumb">
+    {% if listing.image_url %}
+      <img src="{{ listing.image_url }}" alt="{{ listing.title }}">
+    {% else %}
+      <div class="example-placeholder">
+        <span>Sample listing</span>
+        <strong>{{ categories.get(listing.category, listing.category)|title }}</strong>
+        <small>Use a real photo when you post your own listing.</small>
+      </div>
+    {% endif %}
+    <div class="badge-row">
+      <span class="badge {{ listing.status }}">{{ listing.status|replace('_', ' ') }}</span>
+      {% if listing.boosted %}<span class="badge boosted">Boosted</span>{% endif %}
+      {% if listing.is_example %}<span class="badge example">Example</span>{% endif %}
+    </div>
+  </div>
+  <div class="listing-body">
+    <div class="listing-top">
+      <h3>{{ listing.title }}</h3>
+      <strong>KSh {{ "{:,}".format(listing.price) }}</strong>
+    </div>
+    <p>{{ listing.county }} · {{ listing.place }}{% if listing.size_note %} · {{ listing.size_note }}{% endif %}</p>
+    <p class="muted">{{ listing.description[:110] }}{% if listing.description|length > 110 %}...{% endif %}</p>
+    <div class="listing-meta">
+      <span>{{ listing.interest_count }} interested</span>
+      <span>{{ listing.views }} views</span>
+      <span>Ends {{ listing.expires_at.strftime('%d %b') }}</span>
+    </div>
+  </div>
+</a>

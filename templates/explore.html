@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h1>{{ categories.get(category, 'Explore listings') }}</h1>
+      <p>Search by county, place or keywords.</p>
+    </div>
+    <a class="btn secondary" href="{{ url_for('post_listing', category=category) }}">Post a listing</a>
+  </div>
+
+  <form class="filters soft-card" method="get">
+    <input type="hidden" name="category" value="{{ category }}">
+    <input name="q" value="{{ q }}" placeholder="Search a town, estate or title">
+    <select name="county">
+      <option value="">All counties</option>
+      {% for c in counties %}
+      <option value="{{ c }}" {% if county == c %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+    <input name="place" value="{{ place }}" placeholder="Specific place / estate">
+    <select name="sort">
+      <option value="featured" {% if sort == 'featured' %}selected{% endif %}>Featured first</option>
+      <option value="latest" {% if sort == 'latest' %}selected{% endif %}>Latest</option>
+      <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price low</option>
+      <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price high</option>
+      <option value="random" {% if sort == 'random' %}selected{% endif %}>Random</option>
+    </select>
+    <button class="btn primary" type="submit">Search</button>
+  </form>
+
+  <div class="category-chips">
+    <a class="chip {% if category == 'vacant_spaces' %}active{% endif %}" href="{{ url_for('explore', category='vacant_spaces') }}">Vacant houses</a>
+    <a class="chip {% if category == 'shops' %}active{% endif %}" href="{{ url_for('explore', category='shops') }}">Shops</a>
+    <a class="chip {% if category == 'apartments_airbnbs' %}active{% endif %}" href="{{ url_for('explore', category='apartments_airbnbs') }}">Apartments / AirBnBs</a>
+    <a class="chip {% if category == 'real_estate' %}active{% endif %}" href="{{ url_for('explore', category='real_estate') }}">Real estate</a>
+    <a class="chip {% if category == 'car_hire' %}active{% endif %}" href="{{ url_for('explore', category='car_hire') }}">Cars for hire</a>
+    <a class="chip {% if category == 'online' %}active{% endif %}" href="{{ url_for('explore', category='online') }}">Online selling</a>
+  </div>
+
+  {% if featured %}
+  <div class="feature-strip soft-card">
+    {% for listing in featured %}
+      <a href="{{ url_for('listing_detail', listing_id=listing.id) }}" class="feature-item">
+        <strong>{{ listing.title }}</strong>
+        <span>KSh {{ "{:,}".format(listing.price) }}</span>
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="listing-grid large-gap">
+    {% for listing in listings %}
+      {% include "_listing_card.html" %}
+    {% else %}
+      <div class="soft-card empty-state">
+        <h3>No listings match this search yet.</h3>
+        <p>Try another county or place, or post the first one.</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

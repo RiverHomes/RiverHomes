@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h1>Post a listing</h1>
+      <p>Your listing goes to the review desk first. Once approved, it becomes public.</p>
+    </div>
+    <a href="{{ url_for('dashboard') }}">View dashboard</a>
+  </div>
+
+  <div class="post-layout">
+    <form class="soft-card post-form" method="post" enctype="multipart/form-data" data-cache-form>
+      <div class="grid-2">
+        <label>Title <input name="title" required placeholder="Modern apartment in ..."></label>
+        <label>Category
+          <select name="category">
+            <option value="vacant_spaces" {% if category == 'vacant_spaces' %}selected{% endif %}>Vacant houses / spaces</option>
+            <option value="shops" {% if category == 'shops' %}selected{% endif %}>Shops</option>
+            <option value="apartments_airbnbs" {% if category == 'apartments_airbnbs' %}selected{% endif %}>Apartments / AirBnBs</option>
+            <option value="real_estate" {% if category == 'real_estate' %}selected{% endif %}>Real estate</option>
+            <option value="car_hire" {% if category == 'car_hire' %}selected{% endif %}>Cars for hire</option>
+            <option value="online" {% if category == 'online' %}selected{% endif %}>Online selling</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="grid-3">
+        <label>County
+          <select name="county" required>
+            <option value="">Choose county</option>
+            {% for c in counties %}
+            <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Place / Town <input name="place" required placeholder="E.g. Ruaka"></label>
+        <label>Address / landmark <input name="address" placeholder="Near ..."></label>
+      </div>
+
+      <div class="grid-3">
+        <label>Price (KSh) <input name="price" type="number" min="0" required></label>
+        <label>Type / size <input name="size_note" placeholder="Bedsitter, 1 Bedroom, Shop..."></label>
+        <label>WhatsApp link <input name="whatsapp" placeholder="https://wa.me/..."></label>
+      </div>
+
+      <label>Description
+        <textarea name="description" rows="5" placeholder="Mention water, security, transport, parking, Wi‑Fi, viewing terms..."></textarea>
+      </label>
+
+      <div class="grid-2">
+        <label>Upload picture <input name="image_file" type="file" accept="image/*" data-preview-target="upload-preview"></label>
+        <label>Or image URL <input name="image_url" placeholder="https://..."></label>
+      </div>
+      <div id="upload-preview" class="upload-preview soft-card muted-box">
+        <span>Upload preview will appear here.</span>
+      </div>
+
+      <div class="grid-2">
+        <label>Contact phone <input name="contact_phone" required placeholder="07xx xxx xxx"></label>
+        <label>Contact name <input name="contact_name" required placeholder="Owner / agent name"></label>
+      </div>
+
+      <div class="toggles">
+        <label><input type="checkbox" name="boosted"> Boost listing</label>
+        <label><input type="checkbox" name="featured"> Mark as featured</label>
+      </div>
+
+      <div class="post-actions">
+        <button class="btn primary" type="submit">Submit for approval</button>
+        <a class="btn secondary" href="{{ url_for('explore', category=category) }}">Preview marketplace</a>
+      </div>
+    </form>
+
+    <aside class="soft-card pricing-box">
+      <h3>Posting fees</h3>
+      <p>Suggested posting fee based on the listing type.</p>
+      <ul class="price-list">
+        <li><span>Vacant house / space</span><strong>KSh 300–700</strong></li>
+        <li><span>Shops</span><strong>KSh 500</strong></li>
+        <li><span>Apartments / AirBnBs</span><strong>KSh 650</strong></li>
+        <li><span>Real estate</span><strong>KSh 1,000</strong></li>
+        <li><span>Cars for hire</span><strong>KSh 450</strong></li>
+        <li><span>Online selling</span><strong>KSh 350</strong></li>
+      </ul>
+      <div class="mini-note">
+        <h4>Approval</h4>
+        <p>The review desk checks the details manually, then approves the listing once payment is confirmed.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
