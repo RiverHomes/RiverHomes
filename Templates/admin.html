@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h1>Admin console</h1>
+      <p>Approve listings, manage chats, answer complaints, and back up the whole site.</p>
+    </div>
+    {% if admin %}<a class="btn secondary" href="{{ url_for('admin_logout') }}">Log out</a>{% endif %}
+  </div>
+
+  {% if admin %}
+    <div class="dashboard-grid">
+      <div class="soft-card panel"><h3>Users</h3><strong>{{ stats.users }}</strong></div>
+      <div class="soft-card panel"><h3>Admins</h3><strong>{{ stats.admins }}</strong></div>
+      <div class="soft-card panel"><h3>Listings</h3><strong>{{ stats.listings }}</strong></div>
+      <div class="soft-card panel"><h3>Pending</h3><strong>{{ stats.pending }}</strong></div>
+      <div class="soft-card panel"><h3>Leads</h3><strong>{{ stats.leads }}</strong></div>
+      <div class="soft-card panel"><h3>Messages</h3><strong>{{ stats.messages }}</strong></div>
+    </div>
+
+    <div class="admin-grid">
+      <div class="soft-card panel">
+        <h3>Pending approvals</h3>
+        <div class="stack-list">
+          {% for listing in pending_listings %}
+            <div class="stack-item">
+              <strong>{{ listing.title }}</strong>
+              <p>{{ listing.county }} · {{ listing.place }} · KSh {{ "{:,}".format(listing.price) }}</p>
+              <div class="tiny-actions">
+                <a class="btn secondary" href="{{ url_for('listing_detail', listing_id=listing.id) }}">Open</a>
+                <form method="post" action="{{ url_for('admin_approve_listing', listing_id=listing.id) }}">
+                  <button class="btn primary" type="submit">Approve</button>
+                </form>
+                <form method="post" action="{{ url_for('admin_reject_listing', listing_id=listing.id) }}">
+                  <button class="btn ghost" type="submit">Pause</button>
+                </form>
+              </div>
+            </div>
+          {% else %}
+            <p class="muted">No listings waiting for approval.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="soft-card panel">
+        <h3>Admin DMs</h3>
+        <div class="stack-list">
+          {% for msg in recent_messages %}
+            <div class="stack-item">
+              <strong>{{ msg.sender_name }} · {{ msg.sender_role }}</strong>
+              <p>{{ msg.message }}</p>
+              <span>{{ msg.created_at.strftime('%d %b %H:%M') }}</span>
+              <form method="post" action="{{ url_for('admin_reply_message', listing_id=msg.listing_id) }}" class="stack-form">
+                <textarea name="message" rows="2" placeholder="Reply to this listing thread..."></textarea>
+                <button class="btn secondary" type="submit">Send reply</button>
+              </form>
+            </div>
+          {% else %}
+            <p class="muted">No messages yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <div class="soft-card panel">
+        <h3>Complaints inbox</h3>
+        <div class="stack-list">
+          {% for complaint in complaints %}
+            <div class="stack-item">
+              <strong>#{{ complaint.id }} · {{ complaint.subject }}</strong>
+              <p>{{ complaint.sender_name }}{% if complaint.sender_phone %} · {{ complaint.sender_phone }}{% endif %}</p>
+              <p>{{ complaint.message }}</p>
+              {% if complaint.reply %}
+                <div class="mini-note">
+                  <h4>Admin reply</h4>
+                  <p>{{ complaint.reply }}</p>
+                </div>
+              {% endif %}
+              <form method="post" action="{{ url_for('admin_reply_complaint', complaint_id=complaint.id) }}" class="stack-form">
+                <textarea name="reply" rows="3" placeholder="Write a reply to the user..."></textarea>
+                <button class="btn secondary" type="submit">Save reply</button>
+              </form>
+            </div>
+          {% else %}
+            <p class="muted">No complaints yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="soft-card panel">
+        <h3>Recent listings</h3>
+        <div class="stack-list">
+          {% for listing in all_listings %}
+            <div class="stack-item">
+              <strong>{{ listing.title }}</strong>
+              <p>{{ listing.county }} · {{ listing.place }}</p>
+              <span>{{ listing.status }}</span>
+            </div>
+          {% else %}
+            <p class="muted">No listings yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <div class="soft-card panel">
+        <h3>Recent users</h3>
+        <div class="stack-list">
+          {% for user in all_users %}
+            <div class="stack-item">
+              <strong>{{ user.display_name }}</strong>
+              <p>{{ user.phone or 'No phone' }}</p>
+              <span>{{ user.role }}</span>
+            </div>
+          {% else %}
+            <p class="muted">No users yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="soft-card panel">
+        <h3>Backup and restore</h3>
+        <p class="muted">Export the full site data, then upload it again after a rebuild to restore the content.</p>
+        <div class="post-actions">
+          <a class="btn primary" href="{{ url_for('admin_export_backup') }}">Download backup</a>
+          <a class="btn secondary" href="{{ url_for('qr_page') }}">Open QR page</a>
+        </div>
+        <form method="post" action="{{ url_for('admin_import_backup') }}" enctype="multipart/form-data" class="stack-form">
+          <label>Restore backup<input type="file" name="backup_file" accept="application/json"></label>
+          <button class="btn secondary" type="submit">Upload and restore</button>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <div class="admin-auth">
+      {% if admin_mode == 'register' %}
+        <form method="post" class="soft-card stack-form">
+          <input type="hidden" name="action" value="register">
+          <label>Admin username<input name="username" required placeholder="admin"></label>
+          <label>Display name<input name="display_name" placeholder="KEBoma Admin"></label>
+          <label>Phone<input name="phone" placeholder="07xx xxx xxx"></label>
+          <label>Password<input type="password" name="password" required></label>
+          <button class="btn primary" type="submit">Create admin</button>
+        </form>
+      {% else %}
+        <form method="post" class="soft-card stack-form">
+          <input type="hidden" name="action" value="login">
+          <label>Admin password<input type="password" name="password" required></label>
+          <button class="btn primary" type="submit">Log in</button>
+        </form>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

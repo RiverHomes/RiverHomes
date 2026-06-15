@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h1>Landlord account</h1>
+      <p>Create a small account so you can come back later and manage your posts, leads and inbox.</p>
+    </div>
+    <a class="btn secondary" href="{{ url_for('hub') }}">Back</a>
+  </div>
+
+  <div class="post-layout">
+    <form method="post" class="soft-card post-form">
+      <input type="hidden" name="action" value="register">
+      <div class="grid-2">
+        <label>Display name<input name="display_name" placeholder="Landlord name"></label>
+        <label>Phone<input name="phone" placeholder="07xx xxx xxx"></label>
+      </div>
+      <label>Password<input type="password" name="password" placeholder="Create a password"></label>
+      <div class="post-actions">
+        <button class="btn primary" type="submit">Create account</button>
+      </div>
+    </form>
+
+    <form method="post" class="soft-card post-form">
+      <input type="hidden" name="action" value="login">
+      <label>Phone<input name="phone" placeholder="Phone used on the account"></label>
+      <label>Password<input type="password" name="password" placeholder="Enter password"></label>
+      <div class="post-actions">
+        <button class="btn secondary" type="submit">Log in</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h1>Private chat</h1>
+      <p>{{ listing.title }} · {{ listing.county }}, {{ listing.place }}</p>
+    </div>
+    <a href="{{ url_for('listing_detail', listing_id=listing.id) }}">Back to listing</a>
+  </div>
+
+  <div class="chat-shell soft-card">
+    <div class="chat-head">
+      <div>
+        <strong>{{ listing.contact_name }}</strong>
+        <span>{{ listing.contact_phone }}</span>
+      </div>
+      {% if listing.whatsapp %}
+      <a class="btn secondary" target="_blank" href="{{ listing.whatsapp }}">WhatsApp</a>
+      {% endif %}
+    </div>
+
+    <div class="chat-stream">
+      {% for msg in messages %}
+        <div class="bubble {{ msg.sender_role }}">
+          <strong>{{ msg.sender_name }}</strong>
+          <p>{{ msg.message }}</p>
+          <span>{{ msg.created_at.strftime('%d %b %H:%M') }}</span>
+        </div>
+      {% else %}
+        <div class="empty-chat">No messages yet. Start the conversation.</div>
+      {% endfor %}
+    </div>
+
+    <form method="post" class="chat-form">
+      <input name="sender_name" placeholder="Your name" value="{{ session.get('guest_name','') }}">
+      <textarea name="message" rows="3" placeholder="Write your message..."></textarea>
+      <button class="btn primary" type="submit">Send private message</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

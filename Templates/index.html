@@ -1,1 +1,30 @@
-
+{% extends "base.html" %}
+{% block content %}
+<section class="hero hero-gateway">
+  <div class="hero-copy soft-card">
+    <div class="eyebrow">Vacant houses. Shops. Apartments. AirBnBs.</div>
+    <h1>KEBoma Connect makes property and hire listings easy to find.</h1>
+    <p class="lead">A clean space for vacant houses, shops, apartments, AirBnBs, real estate, car hire and online selling.</p>
+    <p class="sublead">Pick your path first, then continue into the right listings and tools.</p>
+  </div>
+  <form method="post" class="role-card soft-card" autocomplete="off">
+    <div class="role-top">
+      <h2>Are you?</h2>
+      <p>Choose the path that matches what you are doing.</p>
+    </div>
+    <label class="choice-card">
+      <input type="radio" name="role" value="tenant" checked>
+      <span><strong>Visitor / Client</strong><small>I am looking for a vacant house, shop, apartment, Airbnb, car hire or online listing.</small></span>
+    </label>
+    <label class="choice-card">
+      <input type="radio" name="role" value="landlord">
+      <span><strong>Landlord / Seller</strong><small>I want to post a listing, revisit it later, and manage messages.</small></span>
+    </label>
+    <label>
+      Your name
+      <input name="name" type="text" placeholder="Optional">
+    </label>
+    <button class="btn primary wide" type="submit">Continue</button>
+  </form>
+</section>
+{% endblock %}

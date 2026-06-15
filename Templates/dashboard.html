@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h1>Your dashboard</h1>
+      <p>Track your posts, approval status, leads and inbox messages in one place.</p>
+    </div>
+    <a class="btn secondary" href="{{ url_for('post_listing') }}">Create new listing</a>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="soft-card panel">
+      <h3>Profile</h3>
+      {% if nav_user %}
+        <p><strong>{{ nav_user.display_name }}</strong></p>
+        <p>Role: {{ nav_user.role }}</p>
+        <p>Listings owned: {{ my_listings|length }}</p>
+      {% else %}
+        <p class="muted">Open a landlord account to manage listings.</p>
+      {% endif %}
+    </div>
+
+    <div class="soft-card panel">
+      <h3>Live activity</h3>
+      <div id="live-stats" class="live-stats">
+        <span>Loading...</span>
+      </div>
+      <p class="fineprint">The counter updates from the server.</p>
+    </div>
+  </div>
+
+  <div class="section-head spaced">
+    <div><h2>My listings</h2></div>
+  </div>
+
+  <div class="listing-grid">
+    {% for listing in my_listings %}
+      {% include "_listing_card.html" %}
+    {% else %}
+      <div class="soft-card empty-state">
+        <h3>No listings yet.</h3>
+        <p>Post your first one and it will show here for approval and follow-up.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="dashboard-grid bottom">
+    <div class="soft-card panel">
+      <h3>Latest leads</h3>
+      <div class="stack-list">
+        {% for lead in my_leads %}
+          <div class="stack-item">
+            <strong>{{ lead.visitor_name }}</strong>
+            <p>{{ lead.message }}</p>
+            <span>{{ lead.created_at.strftime('%d %b %H:%M') }}</span>
+          </div>
+        {% else %}
+          <p class="muted">No leads yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="soft-card panel">
+      <h3>Recent chat messages</h3>
+      <div class="stack-list">
+        {% for msg in my_messages %}
+          <div class="stack-item">
+            <strong>{{ msg.sender_name }} · {{ msg.sender_role }}</strong>
+            <p>{{ msg.message }}</p>
+            <span>{{ msg.created_at.strftime('%d %b %H:%M') }}</span>
+          </div>
+        {% else %}
+          <p class="muted">No messages yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

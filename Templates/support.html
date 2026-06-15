@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h1>Support and complaints</h1>
+      <p>Send a complaint, question, correction or follow-up directly to the support desk.</p>
+    </div>
+    <a class="btn secondary" href="{{ url_for('qr_page') }}">QR download</a>
+  </div>
+
+  <div class="post-layout">
+    <form method="post" class="soft-card post-form" autocomplete="off">
+      <input type="hidden" name="listing_id" value="{{ request.args.get('listing_id', '') }}">
+      <div class="grid-2">
+        <label>Your name<input name="sender_name" placeholder="Your name" value="{{ session.get('guest_name', '') }}"></label>
+        <label>Your phone<input name="sender_phone" placeholder="07xx xxx xxx"></label>
+      </div>
+      <label>Subject
+        <input name="subject" placeholder="Complaint about a listing, seller, payment or support issue">
+      </label>
+      <label>Your message
+        <textarea name="message" rows="6" placeholder="Explain what happened and what you need."></textarea>
+      </label>
+      <div class="post-actions">
+        <button class="btn primary" type="submit">Send to support desk</button>
+        <a class="btn secondary" href="{{ url_for('index') }}">Back home</a>
+      </div>
+    </form>
+
+    <aside class="soft-card pricing-box">
+      <h3>Ticket status</h3>
+      {% if ticket_item %}
+        <p><strong>#{{ ticket_item.id }}</strong> · {{ ticket_item.subject }}</p>
+        <p>{{ ticket_item.message }}</p>
+        <p class="muted">Status: {{ ticket_item.status }}</p>
+        {% if ticket_item.reply %}
+          <div class="mini-note">
+            <h4>Support reply</h4>
+            <p>{{ ticket_item.reply }}</p>
+          </div>
+        {% else %}
+          <p class="muted">No reply yet. The support desk will respond here when available.</p>
+        {% endif %}
+      {% else %}
+        <p>After sending, your ticket number will appear here.</p>
+      {% endif %}
+      <div class="mini-note">
+        <h4>Quick contact</h4>
+        <p>You can also share the page link or QR code from the top bar.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

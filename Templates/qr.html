@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h1>Vacant houses</h1>
+      <p>HOMES. SHOPS. APARTMENTS. AIR BnBS, REAL ESTATE</p>
+    </div>
+  </div>
+
+  <div class="qr-layout">
+    <div class="soft-card qr-card">
+      <img src="{{ url_for('qr_png', target=qr_target or site_url) }}" alt="{{ site_title }} QR code">
+      <p class="muted">{{ qr_target or site_url }}</p>
+      <div class="post-actions">
+        <a class="btn primary" href="{{ url_for('qr_png', target=qr_target or site_url) }}" download>Download QR PNG</a>
+        <button class="btn secondary" type="button" data-share-page>Share site</button>
+      </div>
+    </div>
+    <div class="soft-card qr-card">
+      <h3>Recommended use</h3>
+      <p>Print it on posters, rental notice boards, shop fronts, stickers and flyers.</p>
+      <p class="fineprint">Use the QR to open the site fast on phones and desktops.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}
