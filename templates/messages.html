@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="messages-shell">
+  <aside class="contacts-panel">
+    <div class="panel-head">
+      <div>
+        <h1>{{ settings.message_heading }}</h1>
+        <p>One-way conversations only. Replies are disabled.</p>
+      </div>
+      <div class="pill">{{ messages|length }} items</div>
+    </div>
+
+    <div class="contact-search">
+      <input id="contactSearch" placeholder="Search messages">
+    </div>
+
+    <div class="contact-list" id="contactList">
+      {% for msg in messages %}
+      <button class="contact-row" data-thread="{{ msg.id }}">
+        <div class="avatar small">{{ msg.sender_name[:2]|upper }}</div>
+        <div class="contact-copy">
+          <div class="contact-name">{{ msg.sender_name }}</div>
+          <div class="contact-preview">{{ msg.body[:54] }}</div>
+        </div>
+      </button>
+      {% endfor %}
+      {% if not messages %}
+      <div class="empty-state">No messages yet.</div>
+      {% endif %}
+    </div>
+  </aside>
+
+  <section class="thread-panel">
+    <div class="thread-head">
+      <div>
+        <h2>{{ user.display_name }}</h2>
+        <p>{{ user.contact_masked }}</p>
+      </div>
+      <a class="chip" href="{{ url_for('user_home', public_key=user.public_key) }}">Receipt</a>
+    </div>
+
+    <div class="thread-list">
+      {% for msg in messages %}
+      <article class="bubble {{ 'pinned' if msg.pinned else '' }}">
+        <div class="bubble-meta">
+          <strong>{{ msg.sender_name }}</strong>
+          <span>{{ msg.created_at }}</span>
+        </div>
+        <p>{{ msg.body }}</p>
+      </article>
+      {% endfor %}
+      {% if not messages %}
+      <div class="empty-thread">
+        <h3>No inbox content</h3>
+        <p>Admin can post personal notes here. Replies are disabled.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</section>
+{% endblock %}

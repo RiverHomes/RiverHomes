@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero-grid auth-grid">
+  <div class="hero-card">
+    <div class="hero-kicker">Authentication first</div>
+    <h1>Sign in or register to continue.</h1>
+    <p>This page opens first. New users register once, and returning users log back in next time using the same details.</p>
+
+    <div class="mini-strip">
+      <div class="strip-card">
+        <div class="strip-title">Step 1</div>
+        <strong>Authenticate</strong>
+        <span>New or returning user</span>
+      </div>
+      <div class="strip-card">
+        <div class="strip-title">Step 2</div>
+        <strong>Access</strong>
+        <span>Private user page</span>
+      </div>
+      <div class="strip-card">
+        <div class="strip-title">Step 3</div>
+        <strong>Offline</strong>
+        <span>PWA keeps loading</span>
+      </div>
+    </div>
+
+    {% if referral %}
+    <div class="referral-banner" style="margin-top:18px;">
+      <strong>Referred by {{ referral.display_name }}</strong>
+      <span>{{ referral.public_key }}</span>
+    </div>
+    {% endif %}
+
+    <div class="band-note mini-card" style="margin-top:18px;">
+      <h3>Reference bands</h3>
+      <div class="band-list">
+        <div>0–30 = 5</div>
+        <div>50–65 = 20</div>
+        <div>66–75 = 35</div>
+        <div>76–100 = 45</div>
+        <div>100–130 = 60</div>
+        <div>131–165 = 70</div>
+        <div>165–200 = 80</div>
+        <div>Above 200 = 100</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-stack">
+    <div class="mini-card accent-panel">
+      <h3>Returning user login</h3>
+      <form class="login-form" action="{{ url_for('login_user') }}" method="post">
+        <label class="full">
+          <span>Name</span>
+          <input name="display_name" placeholder="Murima 01" required>
+        </label>
+        <label class="full">
+          <span>Contact</span>
+          <input name="contact" placeholder="0712345678" required>
+        </label>
+        <button class="primary full" type="submit">Log in</button>
+      </form>
+      <p class="tiny">Use the same name and contact you registered with.</p>
+    </div>
+
+    <div class="mini-card accent-panel">
+      <h3>New user registration</h3>
+      <form class="entry-form" action="{{ url_for('register') }}" method="post">
+        {% if referral %}
+        <input type="hidden" name="referrer_public_key" value="{{ referral.public_key }}">
+        {% endif %}
+        <label class="full">
+          <span>Name</span>
+          <input name="display_name" placeholder="Mom / Dad / User 1" required>
+        </label>
+        <label class="full">
+          <span>Contact</span>
+          <input name="contact" placeholder="0712345678" required>
+        </label>
+        <label>
+          <span>Amount</span>
+          <input name="amount" type="number" step="0.01" value="100">
+        </label>
+        <label>
+          <span>Date & time</span>
+          <input name="receipt_time" type="datetime-local">
+        </label>
+        <label class="full">
+          <span>Optional note</span>
+          <input name="receipt_note" placeholder="Add a custom note">
+        </label>
+        <button class="primary full" type="submit">Register and continue</button>
+      </form>
+      <p class="tiny">Approved users will open their private home page automatically on future visits.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

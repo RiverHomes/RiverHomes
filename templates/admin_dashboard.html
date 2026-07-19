@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="admin-layout">
+  <div class="card wide">
+    <h1>Dashboard</h1>
+    <p>Users stay pending until approved. You can edit receipts, messages, referrals, and admin roles from here.</p>
+    <form class="settings-grid" method="post" action="{{ url_for('update_settings') }}">
+      <label><span>Site name</span><input name="site_name" value="{{ settings.site_name }}"></label>
+      <label><span>Subtitle</span><input name="brand_subtitle" value="{{ settings.brand_subtitle }}"></label>
+      <label><span>Receipt heading</span><input name="receipt_heading" value="{{ settings.receipt_heading }}"></label>
+      <label><span>Receipt subheading</span><input name="receipt_subheading" value="{{ settings.receipt_subheading }}"></label>
+      <label><span>Message heading</span><input name="message_heading" value="{{ settings.message_heading }}"></label>
+      <label><span>Footer note</span><input name="footer_note" value="{{ settings.footer_note }}"></label>
+      <label class="full"><span>Download link</span><input name="download_link" value="{{ settings.download_link }}"></label>
+      <button class="primary full" type="submit">Save settings</button>
+    </form>
+  </div>
+
+  <div class="card wide">
+    <h2>Admins</h2>
+    <p>The first admin can be any username you choose. Add more admins with their own username and password.</p>
+    <form class="settings-grid" method="post" action="{{ url_for('add_admin') }}">
+      <label class="full"><span>Admin username</span><input name="username" placeholder="chief-admin"></label>
+      <label class="full"><span>New admin password</span><input name="password" type="password" placeholder="Set a password"></label>
+      <button class="primary full" type="submit">Add admin</button>
+    </form>
+    <div class="log-list">
+      {% for admin in admins %}
+      <div class="log-row">
+        <div>
+          <strong>{{ admin.username }}</strong>
+          <p>Created {{ admin.created_at }}</p>
+        </div>
+        <form method="post" action="{{ url_for('remove_admin', username=admin.username) }}" onsubmit="return confirm('Remove this admin?')">
+          <button class="chip danger" type="submit">Remove</button>
+        </form>
+      </div>
+      {% endfor %}
+      {% if not admins %}
+      <div class="empty-state">No admins yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card wide">
+    <h2>Recent download logs</h2>
+    <p>Who downloaded, when it happened, and the amount shown on the receipt.</p>
+    <div class="log-list">
+      {% for log in download_logs %}
+      <div class="log-row">
+        <div>
+          <strong>{{ log.display_name }}</strong>
+          <p>{{ log.user_public_key }} · Ksh {{ "%.2f"|format(log.amount) }}</p>
+          <small>{{ log.created_at }}</small>
+        </div>
+        <div class="log-meta">
+          <div>Referrer: {{ log.referrer_public_key or '—' }}</div>
+          <div>{{ log.ip_address or 'Unknown IP' }}</div>
+        </div>
+      </div>
+      {% endfor %}
+      {% if not download_logs %}
+      <div class="empty-state">No downloads yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% for user in users %}
+  <div class="card wide">
+    <div class="user-card-head">
+      <div>
+        <h2>{{ user.display_name }}</h2>
+        <p>{{ user.public_key }} · {{ "Approved" if user.approved else "Pending" }} · Referrals {{ referral_counts.get(user.public_key, 0) }} · Downloads {{ download_counts.get(user.public_key, 0) }}</p>
+      </div>
+      <div class="actions-inline">
+        <form method="post" action="{{ url_for('approve_user', public_key=user.public_key) }}">
+          <button class="chip" type="submit">Approve</button>
+        </form>
+        <form method="post" action="{{ url_for('delete_user', public_key=user.public_key) }}" onsubmit="return confirm('Delete this user?')">
+          <button class="chip danger" type="submit">Delete</button>
+        </form>
+      </div>
+    </div>
+
+    <form class="settings-grid" method="post" action="{{ url_for('save_user', public_key=user.public_key) }}">
+      <label><span>Name</span><input name="display_name" value="{{ user.display_name }}"></label>
+      <label><span>Contact</span><input name="contact" value="{{ user.contact }}"></label>
+      <label><span>Amount</span><input name="amount" type="number" step="0.01" value="{{ user.amount }}"></label>
+      <label><span>Date & time</span><input name="receipt_time" type="datetime-local" value="{{ user.receipt_time.replace(' ', 'T')[:16] }}"></label>
+      <label class="full"><span>Note</span><input name="receipt_note" value="{{ user.receipt_note }}"></label>
+      <button class="primary full" type="submit">Update receipt data</button>
+    </form>
+
+    <div class="user-links">
+      <a class="chip" href="{{ url_for('user_home', public_key=user.public_key) }}">Open receipt</a>
+      <a class="chip" href="{{ url_for('user_messages', public_key=user.public_key) }}">Open messages</a>
+      <a class="chip" href="{{ url_for('download_receipt', public_key=user.public_key) }}">Download HTML</a>
+      <span class="chip">Referral link: {{ request.host_url.rstrip('/') }}{{ url_for('index') }}?ref={{ user.public_key }}</span>
+    </div>
+
+    <div class="admin-message-form">
+      <form method="post" action="{{ url_for('add_message', public_key=user.public_key) }}">
+        <div class="settings-grid">
+          <label><span>Sender</span><input name="sender_name" value="System"></label>
+          <label><span>Pin</span><select name="pinned"><option value="0">No</option><option value="1">Yes</option></select></label>
+          <label class="full"><span>Message</span><textarea name="body" rows="3" placeholder="Write the one-way message"></textarea></label>
+          <button class="primary full" type="submit">Add message</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="admin-thread">
+      {% for msg in messages_by_user[user.public_key] %}
+      <div class="admin-thread-row">
+        <form class="message-edit-form" method="post" action="{{ url_for('edit_message', message_id=msg.id) }}">
+          <div class="settings-grid">
+            <label><span>Sender</span><input name="sender_name" value="{{ msg.sender_name }}"></label>
+            <label><span>Pin</span><select name="pinned"><option value="0" {% if not msg.pinned %}selected{% endif %}>No</option><option value="1" {% if msg.pinned %}selected{% endif %}>Yes</option></select></label>
+            <label class="full"><span>Message</span><textarea name="body" rows="3">{{ msg.body }}</textarea></label>
+            <button class="primary full" type="submit">Save message</button>
+          </div>
+        </form>
+        <form method="post" action="{{ url_for('delete_message', message_id=msg.id) }}" onsubmit="return confirm('Delete this message?')">
+          <button class="chip danger" type="submit">Remove</button>
+        </form>
+      </div>
+      {% endfor %}
+      {% if not messages_by_user[user.public_key] %}
+      <div class="empty-state">No messages for this user yet.</div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}

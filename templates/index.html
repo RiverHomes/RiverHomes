@@ -1,30 +1,81 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="hero hero-gateway">
-  <div class="hero-copy soft-card">
-    <div class="eyebrow">Vacant houses. Shops. Apartments. AirBnBs.</div>
-    <h1>KEBoma Connect makes property and hire listings easy to find.</h1>
-    <p class="lead">A clean space for vacant houses, shops, apartments, AirBnBs, real estate, car hire and online selling.</p>
-    <p class="sublead">Pick your path first, then continue into the right listings and tools.</p>
-  </div>
-  <form method="post" class="role-card soft-card" autocomplete="off">
-    <div class="role-top">
-      <h2>Are you?</h2>
-      <p>Choose the path that matches what you are doing.</p>
+<section class="hero-grid">
+  <div class="hero-card">
+    <div class="hero-kicker">Public site + PWA</div>
+    <h1>Register first, then open your private home.</h1>
+    <p>Create a personal record, keep it private, and receive a receipt page plus one-way messages tied only to that user.</p>
+
+    <div class="app-cta-row">
+      <a class="chip app-cta" href="{{ url_for('receipt_app') }}">Download receipt app</a>
+      <a class="chip app-cta" href="{{ url_for('sms_app') }}">Download SMS app</a>
     </div>
-    <label class="choice-card">
-      <input type="radio" name="role" value="tenant" checked>
-      <span><strong>Visitor / Client</strong><small>I am looking for a vacant house, shop, apartment, Airbnb, car hire or online listing.</small></span>
-    </label>
-    <label class="choice-card">
-      <input type="radio" name="role" value="landlord">
-      <span><strong>Landlord / Seller</strong><small>I want to post a listing, revisit it later, and manage messages.</small></span>
-    </label>
-    <label>
-      Your name
-      <input name="name" type="text" placeholder="Optional">
-    </label>
-    <button class="btn primary wide" type="submit">Continue</button>
-  </form>
+
+    <form id="register" class="entry-form" action="{{ url_for('register') }}" method="post">
+      {% if referral %}
+      <input type="hidden" name="referrer_public_key" value="{{ referral.public_key }}">
+      <div class="full referral-banner">
+        <strong>Referred by {{ referral.display_name }}</strong>
+        <span>{{ referral.public_key }}</span>
+      </div>
+      {% endif %}
+      <label>
+        <span>Name</span>
+        <input name="display_name" placeholder="Murima 01 / Dad 2 / Aunty3" required>
+      </label>
+      <label>
+        <span>Contact</span>
+        <input name="contact" placeholder="0712345678" required>
+      </label>
+      <label>
+        <span>Amount</span>
+        <input name="amount" type="number" step="0.01" value="100">
+      </label>
+      <label>
+        <span>Date & time</span>
+        <input name="receipt_time" type="datetime-local">
+      </label>
+      <label class="full">
+        <span>Optional note</span>
+        <input name="receipt_note" placeholder="Add a custom note">
+      </label>
+      <button class="primary full" type="submit">Create pending record</button>
+    </form>
+    <p class="tiny">Approved users can open their own receipt and messages pages. Unapproved users see a pending screen.</p>
+  </div>
+
+  <div class="side-stack">
+    <div class="mini-card accent-panel">
+      <h3>Receipt preview</h3>
+      <div class="preview-plate">
+        <div class="preview-badge">✦</div>
+        <div>
+          <div class="preview-title">Custom receipt view</div>
+          <div class="preview-sub">Personal branding, not a copy.</div>
+        </div>
+      </div>
+    </div>
+    <div class="mini-card accent-panel">
+      <h3>Messages app</h3>
+      <p>One-way messages only. Admin can add, edit, pin, or remove them per user.</p>
+    </div>
+    <div class="mini-card accent-panel">
+      <h3>Reference bands</h3>
+      <div class="band-list">
+        <div>0–30 = 5</div>
+        <div>50–65 = 20</div>
+        <div>66–75 = 35</div>
+        <div>76–100 = 45</div>
+        <div>100–130 = 60</div>
+        <div>131–165 = 70</div>
+        <div>165–200 = 80</div>
+        <div>Above 200 = 100</div>
+      </div>
+    </div>
+    <div class="mini-card accent-panel">
+      <h3>Offline shell</h3>
+      <p>The PWA caches the app shell so the experience keeps loading offline after first visit.</p>
+    </div>
+  </div>
 </section>
 {% endblock %}

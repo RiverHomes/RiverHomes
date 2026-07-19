@@ -1,23 +1,28 @@
-# River Homes
+# Murima Ledger PWA
 
-A clean, role-gated marketplace for Kenyan rental homes, business spaces, real estate, vehicles and online listings.
+A distinct, branded receipt-and-messages demo with:
+- registration before private access,
+- a per-user receipt view,
+- a one-way messages app,
+- admin approval and editing,
+- referral tracking,
+- download activity logs,
+- offline PWA shell support.
 
-## Local run
+## Run locally
 ```bash
-python -m venv venv
-venv\Scriptsctivate   # Windows
 pip install -r requirements.txt
 python app.py
 ```
 
-## Main flow
-- `/` opens the tenant / landlord choice screen.
-- `/hub` appears only after a role is selected.
-- `/buh` is the private admin console.
-- `/qr` shows a printable QR code.
+## Render
+- Build: `pip install -r requirements.txt`
+- Start: `gunicorn app:app`
 
-## Render notes
-- Start command: `gunicorn app:app`
-- Build command: `pip install -r requirements.txt`
-- Set `SITE_URL` after deploy so the QR code points at the live domain.
-- For production image persistence, attach external storage or a persistent disk.
+Set optional env vars:
+- `ADMIN_ROUTE` (optional; otherwise the route is stored in the admin database)
+- `SECRET_KEY`
+- `SECRET_SALT`
+- `APP_NAME`
+
+Admin accounts now use a username + password hash stored in the database, and the admin route is loaded from the admin database or the `ADMIN_ROUTE` environment variable.

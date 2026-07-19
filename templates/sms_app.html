@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card wide center narrow">
+  <div class="status-icon">💬</div>
+  <h1>SMS app</h1>
+  <p>A one-way messages view that behaves like a simple messaging app, but replies stay off.</p>
+  <div class="link-row">
+    <a class="primary" href="{{ url_for('index') }}#register">Register now</a>
+    <a class="chip" href="{{ url_for('index') }}">Go home</a>
+  </div>
+</section>
+{% endblock %}

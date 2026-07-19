@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="receipt-wrap {% if printable %}printable{% endif %}">
+  <div class="receipt-actions">
+    <a class="icon-btn" href="{{ url_for('index') }}">✕</a>
+    <a class="icon-btn" href="{{ url_for('user_home', public_key=user.public_key) }}">↻</a>
+  </div>
+
+  <article class="receipt-card">
+    <div class="receipt-topline"></div>
+
+    <div class="receipt-emblem">✓</div>
+
+    <h1>{{ settings.receipt_heading }}</h1>
+    <p class="subhead">{{ settings.receipt_subheading }}</p>
+
+    <div class="receipt-date">{{ user.receipt_time }}</div>
+
+    <div class="receipt-amount">Ksh {{ "%.2f"|format(user.amount) }}</div>
+    <div class="receipt-cost">Transaction cost: <strong>Ksh {{ "%.2f"|format(user.transaction_cost) }}</strong></div>
+
+    <div class="receipt-code">ID: <span>{{ user.code }}</span> <button class="text-copy" data-copy="{{ user.code }}">Copy</button></div>
+
+    <div class="recipient-card">
+      <div class="avatar">{{ user.display_name[:2]|upper }}</div>
+      <div class="recipient-meta">
+        <div class="recipient-label">Send to:</div>
+        <div class="recipient-name">{{ user.display_name }}</div>
+        <div class="recipient-phone">Phone number: {{ user.contact_masked }}</div>
+      </div>
+    </div>
+
+    {% if user.receipt_note %}
+    <div class="note-box">{{ user.receipt_note }}</div>
+    {% endif %}
+
+    <div class="action-row">
+      <button class="ghost-btn" data-fav="{{ user.public_key }}">☆ Add to favourites</button>
+      <a class="ghost-btn" href="{{ url_for('download_receipt', public_key=user.public_key) }}">⬇ Download receipt</a>
+    </div>
+
+    <div class="receipt-stats">
+      <div><strong>{{ download_count or 0 }}</strong><span>Downloads</span></div>
+      <div><strong>{{ referral_count or 0 }}</strong><span>Referrals</span></div>
+      <div><strong>{{ user.public_key }}</strong><span>Receipt key</span></div>
+    </div>
+
+    <a class="done-btn" href="{{ url_for('user_messages', public_key=user.public_key) }}">Open messages</a>
+  </article>
+
+  <section class="mini-strip">
+    <div class="strip-card">
+      <span class="strip-title">Status</span>
+      <strong>{{ "Approved" if user.approved else "Pending" }}</strong>
+    </div>
+    <div class="strip-card">
+      <span class="strip-title">Balance</span>
+      <strong>Ksh {{ "%.2f"|format(user.balance) }}</strong>
+    </div>
+    <div class="strip-card">
+      <span class="strip-title">Referral link</span>
+      <strong>{{ request.host_url.rstrip('/') }}{{ url_for('index') }}?ref={{ user.public_key }}</strong>
+    </div>
+  </section>
+</section>
+{% endblock %}

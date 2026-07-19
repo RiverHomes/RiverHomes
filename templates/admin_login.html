@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card wide center narrow">
+  {% if mode == "register" %}
+  <h1>Register first admin</h1>
+  <p>Create your own admin username and password. No special key is required.</p>
+  {% else %}
+  <h1>Admin log in</h1>
+  <p>Enter your admin username and password to unlock the dashboard.</p>
+  {% endif %}
+
+  {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+
+  <form class="login-form" method="post">
+    <input type="hidden" name="action" value="{{ 'register' if mode == 'register' else 'login' }}">
+    <label class="full">
+      <span>Admin username</span>
+      <input name="username" placeholder="your-name" value="{{ first_admin_username if mode == 'register' else '' }}">
+    </label>
+    <label class="full">
+      <span>Admin password</span>
+      <input name="password" type="password" placeholder="••••••••">
+    </label>
+    <button class="primary full" type="submit">
+      {{ 'Create admin and enter dashboard' if mode == 'register' else 'Log in to dashboard' }}
+    </button>
+  </form>
+</section>
+{% endblock %}

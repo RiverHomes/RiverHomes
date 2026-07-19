@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card wide center">
+  <div class="status-icon">📡</div>
+  <h1>Offline mode</h1>
+  <p>{{ message or settings.footer_note or 'The app shell is available, but this page needs a fresh connection for full data.' }}</p>
+</section>
+{% endblock %}
