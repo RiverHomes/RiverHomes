@@ -612,43 +612,7 @@ def user_home(public_key):
         printable=False,
         download_count=download_count,
         referral_count=referral_count,
-        editable=False,
-        editor_open=False,
-        no_chrome=True,
-    )
-
-@app.route("/u/<public_key>/receipt/open")
-@require_registered_user
-def open_receipt(public_key):
-    user = fetch_user(public_key)
-    if not user:
-        abort(404)
-    if not user["approved"]:
-        return render_template("public_approval.html", user=user, settings=get_settings())
-    seed_default_messages(public_key)
-    user = fetch_user(public_key)
-    messages = db().execute(
-        "SELECT * FROM messages WHERE user_public_key = ? ORDER BY pinned DESC, id DESC",
-        (public_key,),
-    ).fetchall()
-    download_count = db().execute(
-        "SELECT COUNT(*) AS c FROM download_logs WHERE user_public_key = ?",
-        (public_key,),
-    ).fetchone()["c"]
-    referral_count = db().execute(
-        "SELECT COUNT(*) AS c FROM users WHERE referrer_public_key = ?",
-        (public_key,),
-    ).fetchone()["c"]
-    return render_template(
-        "receipt.html",
-        user=user,
-        messages=messages,
-        settings=get_settings(),
-        printable=False,
-        download_count=download_count,
-        referral_count=referral_count,
         editable=True,
-        editor_open=True,
         no_chrome=True,
     )
 @app.route("/u/<public_key>/messages")
