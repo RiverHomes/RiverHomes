@@ -34,7 +34,7 @@ button,input,textarea,select{font:inherit}
 .toplinks{display:flex;gap:14px}
 .toplinks a{color:var(--accent);padding:10px 14px;border-radius:999px;background:rgba(184,15,37,.06);border:1px solid rgba(184,15,37,.09)}
 
-.page-shell{max-width:1180px;margin:0 auto;padding:14px 18px 42px}
+.page-shell{max-width:1180px;margin:0 auto;padding:14px 18px 42px}.page-shell.no-chrome{max-width:none;padding:0}
 .flash-stack{display:grid;gap:10px;margin:0 0 16px}
 .flash{padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.75)}
 .flash.success{border-color:rgba(184,15,37,.25)}
@@ -184,12 +184,12 @@ html,body{background:linear-gradient(180deg,#0f1115 0%, #151922 100%);color:#eef
 .entry-form input:focus,.settings-grid input:focus,.settings-grid textarea:focus,.login-form input:focus,.contact-search input:focus,.settings-grid select:focus,.editor-grid input:focus{border-color:rgba(41,151,255,.45);box-shadow:0 0 0 4px rgba(41,151,255,.08)}
 .primary,.done-btn{background:linear-gradient(135deg,var(--green),var(--green-2));color:#09110b;box-shadow:0 16px 30px rgba(45,216,111,.18)}
 .chip,.ghost-btn,.icon-btn,.circle-action,.receipt-action-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#eef2f7}
-.receipt-shell{max-width:760px;margin:0 auto;display:grid;gap:14px}
+.receipt-shell{width:min(100%,960px);margin:0 auto;display:grid;gap:14px;padding:0 0 24px}
 .receipt-top-actions{display:flex;justify-content:space-between;align-items:center;padding:0 6px}
 .circle-action{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-weight:800}
 .receipt-editor{background:rgba(20,23,29,.92);border:1px solid rgba(255,255,255,.06);border-radius:28px;padding:18px}
 .editor-title{font-weight:800;margin-bottom:10px}
-.receipt-card.dark-receipt{background:#191c22;border:1px solid rgba(255,255,255,.05);color:var(--receipt-text);border-radius:34px;box-shadow:0 30px 80px rgba(0,0,0,.36);padding-top:24px}
+.receipt-card.dark-receipt{background:#191c22;border:1px solid rgba(255,255,255,.05);color:var(--receipt-text);border-radius:34px;box-shadow:0 30px 80px rgba(0,0,0,.36);padding-top:24px;width:100%}
 .receipt-card.dark-receipt .receipt-topline{background:linear-gradient(90deg,var(--blue),var(--green));height:3px}
 .receipt-top-icon{width:120px;height:120px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;background:#11131a;border:2px solid rgba(255,255,255,.08);font-size:3rem}
 .receipt-card.dark-receipt h1{margin:0;text-align:center;color:#fff;font-size:2.1rem;line-height:1.05}

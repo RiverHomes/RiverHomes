@@ -12,6 +12,7 @@
   <div class="bg-glow bg-glow-a"></div>
   <div class="bg-glow bg-glow-b"></div>
 
+{% if not no_chrome %}
   <header class="topbar">
     <div class="brand">
       <div class="brand-mark">M</div>
@@ -27,8 +28,9 @@
     </div>
     {% endif %}
   </header>
+{% endif %}
 
-  <main class="page-shell">
+  <main class="page-shell {% if no_chrome %}no-chrome{% endif %}">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="flash-stack">

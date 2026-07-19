@@ -1,15 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="receipt-shell {% if printable %}printable{% endif %}">
-  <div class="receipt-top-actions">
-    <a class="circle-action" href="{{ url_for('index') }}">✕</a>
-    <a class="circle-action" href="{{ url_for('user_home', public_key=user.public_key) }}">⇪</a>
-  </div>
-
   {% if editable and not printable %}
   <form class="receipt-editor" action="{{ url_for('save_receipt', public_key=user.public_key) }}" method="post">
     <div class="editor-title">Generate receipt</div>
     <div class="editor-grid">
+      <label><span>Send to name</span><input name="recipient_name" value="{{ user.recipient_name or user.display_name }}"></label>
       <label><span>Contact</span><input name="contact" value="{{ user.contact }}"></label>
       <label><span>Amount</span><input name="amount" type="number" step="0.01" value="{{ '%.2f'|format(user.amount) }}"></label>
       <label><span>Date & time</span><input name="receipt_time" value="{{ user.receipt_time }}"></label>
@@ -24,7 +20,7 @@
 
     <div class="receipt-top-icon">🎉</div>
 
-    <h1>Your transaction<br>was successful</h1>
+    <h1>Your transaction was<br>Successful</h1>
     <p class="subhead">{{ user.receipt_time }}</p>
 
     <div class="receipt-amount">Ksh {{ "%.2f"|format(user.amount) }}</div>
@@ -37,7 +33,7 @@
       <div class="recipient-row">
         <div class="avatar dark-avatar">{{ user.display_name[:2]|upper }}</div>
         <div class="recipient-meta">
-          <div class="recipient-name">{{ user.display_name }}</div>
+          <div class="recipient-name">{{ user.recipient_name or user.display_name }}</div>
           <div class="recipient-phone">{{ user.contact_masked }}</div>
         </div>
       </div>

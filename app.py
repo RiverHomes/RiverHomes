@@ -213,6 +213,7 @@ def init_db():
             balance REAL NOT NULL DEFAULT 0.0,
             code TEXT NOT NULL,
             receipt_note TEXT DEFAULT '',
+            recipient_name TEXT NOT NULL DEFAULT '',
             referrer_public_key TEXT NOT NULL DEFAULT '',
             approved INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL,
@@ -221,6 +222,7 @@ def init_db():
         """
     )
     ensure_column(cur, "users", "referrer_public_key", "TEXT NOT NULL DEFAULT ''")
+    ensure_column(cur, "users", "recipient_name", "TEXT NOT NULL DEFAULT ''")
 
     cur.execute(
         """
@@ -362,6 +364,7 @@ def receipt_payload(user):
         "display_name": user["display_name"],
         "contact": user["contact"],
         "contact_masked": user["contact_masked"],
+        "recipient_name": user["recipient_name"] or user["display_name"],
         "amount": float(user["amount"] or 0.0),
         "transaction_cost": float(user["transaction_cost"] or 0.0),
         "receipt_time": user["receipt_time"],
@@ -417,7 +420,7 @@ def render_receipt_png(user):
     draw.ellipse((225, 1075, 340, 1190), fill="#8b4f22")
     initials = (data["display_name"][:2] or "??").upper()
     draw.text((283, 1132), initials, font=_load_font(40, True), fill="#ffb26f", anchor="mm")
-    draw.text((380, 1088), data["display_name"], font=f_mid_b, fill="#ffffff")
+    draw.text((380, 1088), data["recipient_name"], font=f_mid_b, fill="#ffffff")
     draw.text((380, 1140), data["contact_masked"], font=f_mid, fill="#c7ced8")
 
     if data["receipt_note"]:
@@ -448,8 +451,8 @@ def render_receipt_pdf(user):
     c.line(36, h - 40, w - 36, h - 40)
     c.setFillColor(HexColor("#ffffff"))
     c.setFont("Helvetica-Bold", 26)
-    c.drawCentredString(w / 2, h - 120, "Your transaction")
-    c.drawCentredString(w / 2, h - 150, "was successful")
+    c.drawCentredString(w / 2, h - 120, "Your transaction was")
+    c.drawCentredString(w / 2, h - 150, "Successful")
     c.setFillColor(HexColor("#b8bfca"))
     c.setFont("Helvetica", 12)
     c.drawCentredString(w / 2, h - 188, data["receipt_time"])
@@ -465,7 +468,7 @@ def render_receipt_pdf(user):
     c.drawRightString(w - 80, h - 300, "Copy")
     c.setFillColor(HexColor("#c7ced8"))
     c.setFont("Helvetica", 12)
-    c.drawString(80, h - 360, f"Send to: {data['display_name']}")
+    c.drawString(80, h - 360, f"Send to: {data['recipient_name']}")
     c.drawString(80, h - 382, f"Contact: {data['contact_masked']}")
     if data["receipt_note"]:
         text_obj = c.beginText(80, h - 430)
@@ -598,8 +601,8 @@ def register():
     conn.execute(
         """
         INSERT INTO users
-        (public_key, display_name, contact, contact_masked, amount, transaction_cost, receipt_time, balance, code, receipt_note, referrer_public_key, approved, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+        (public_key, display_name, contact, contact_masked, amount, transaction_cost, receipt_time, balance, code, receipt_note, recipient_name, referrer_public_key, approved, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
         """,
         (
             public_key,
@@ -612,6 +615,7 @@ def register():
             balance,
             code,
             receipt_note,
+            "",
             referrer_public_key,
             now_iso(),
             now_iso(),
@@ -689,6 +693,7 @@ def user_home(public_key):
         download_count=download_count,
         referral_count=referral_count,
         editable=True,
+        no_chrome=True,
     )
 
 
@@ -717,6 +722,7 @@ def save_receipt(public_key):
         return render_template("public_approval.html", user=user, settings=get_settings())
 
     amount = safe_float(request.form.get("amount"), float(user["amount"]))
+    recipient_name = (request.form.get("recipient_name") or user["recipient_name"] or user["display_name"]).strip()
     receipt_time = parse_datetime_input(request.form.get("receipt_time") or user["receipt_time"])
     receipt_note = (request.form.get("receipt_note") or "").strip()
     contact = (request.form.get("contact") or user["contact"]).strip()
@@ -727,10 +733,10 @@ def save_receipt(public_key):
     db().execute(
         """
         UPDATE users
-        SET contact = ?, contact_masked = ?, amount = ?, receipt_time = ?, balance = ?, code = ?, receipt_note = ?, updated_at = ?
+        SET contact = ?, contact_masked = ?, amount = ?, receipt_time = ?, balance = ?, code = ?, receipt_note = ?, recipient_name = ?, updated_at = ?
         WHERE public_key = ?
         """,
-        (contact, contact_masked, amount, receipt_time, balance, code, receipt_note, now_iso(), public_key),
+        (contact, contact_masked, amount, receipt_time, balance, code, receipt_note, recipient_name, now_iso(), public_key),
     )
     db().commit()
     seed_default_messages(public_key)
@@ -803,12 +809,12 @@ def download_receipt_pdf(public_key):
 
 @app.route("/receipt-app")
 def receipt_app():
-    return render_template("receipt_app.html", settings=get_settings())
+    return render_template("receipt_app.html", settings=get_settings(), no_chrome=True)
 
 
 @app.route("/sms-app")
 def sms_app():
-    return render_template("sms_app.html", settings=get_settings())
+    return render_template("sms_app.html", settings=get_settings(), no_chrome=True)
 
 
 
