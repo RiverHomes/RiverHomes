@@ -1,109 +1,174 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="receipt-shell {% if printable %}printable{% endif %}">
-  <div class="receipt-top-actions" aria-label="Receipt controls">
-    <button class="circle-action receipt-close-btn" type="button" aria-label="Close">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M6 6l12 12" stroke="#ff3b30" stroke-width="2.8" stroke-linecap="round"/>
-        <path d="M18 6L6 18" stroke="#34c759" stroke-width="2.8" stroke-linecap="round"/>
+
+<section class="receipt-shell">
+
+  <!-- TOP BAR (part of receipt screen) -->
+  <div class="receipt-top-actions">
+
+    <button class="circle-action" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24">
+        <path d="M6 6L18 18" stroke="#FF3B30" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M18 6L6 18" stroke="#34C759" stroke-width="2.8" stroke-linecap="round"/>
       </svg>
     </button>
-    <button class="circle-action receipt-share-btn" type="button" aria-label="Share receipt">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M12 16V5" stroke="#34c759" stroke-width="2.4" stroke-linecap="round"/>
-        <path d="M8.5 8.5L12 5l3.5 3.5" fill="none" stroke="#ff9500" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M6 18.5h12" stroke="#34c759" stroke-width="2.4" stroke-linecap="round"/>
+
+    <button class="circle-action" type="button" aria-label="Share">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 16V5" stroke="#34C759" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M8.5 8.5L12 5l3.5 3.5"
+              fill="none"
+              stroke="#FF9500"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+        <path d="M6 18.5h12" stroke="#34C759" stroke-width="2.4" stroke-linecap="round"/>
       </svg>
     </button>
+
   </div>
 
-  {% if editable and not printable %}
-  <form class="receipt-editor" action="{{ url_for('save_receipt', public_key=user.public_key) }}" method="post">
-    <div class="editor-title">Generate receipt</div>
-    <div class="editor-grid">
-      <label><span>Send to name</span><input name="recipient_name" value="{{ user.recipient_name or user.display_name }}"></label>
-      <label><span>Contact</span><input name="contact" value="{{ user.contact }}"></label>
-      <label><span>Amount</span><input name="amount" type="number" step="0.01" value="{{ '%.2f'|format(user.amount) }}"></label>
-      <label><span>Date & time</span><input name="receipt_time" value="{{ user.receipt_time }}"></label>
-      <label class="full"><span>Note</span><input name="receipt_note" value="{{ user.receipt_note }}"></label>
-      <button class="primary full" type="submit">Generate receipt</button>
-    </div>
-  </form>
-  {% endif %}
-
+  <!-- RECEIPT CARD -->
   <article class="receipt-card dark-receipt">
+
+    <!-- Gradient line -->
     <div class="receipt-topline"></div>
 
+    <!-- Success icon -->
     <div class="receipt-top-icon">🎉</div>
 
-    <h1>Your transaction was<br>Successful</h1>
-    <p class="subhead">{{ user.receipt_time }}</p>
+    <!-- Main text -->
+    <h1 class="receipt-title">
+      Your transaction was<br>successful
+    </h1>
 
-    <div class="receipt-amount">Ksh {{ "%.2f"|format(user.amount) }}</div>
-    <div class="receipt-cost">Transaction cost: <strong>Ksh {{ "%.2f"|format(user.transaction_cost) }}</strong></div>
+    <p class="receipt-time">{{ user.receipt_time }}</p>
 
-    <div class="receipt-code">ID: <span>{{ user.code }}</span> <button class="text-copy" data-copy="{{ user.code }}">⧉ Copy</button></div>
+    <div class="receipt-amount">
+      Ksh {{ "%.2f"|format(user.amount) }}
+    </div>
 
+    <div class="receipt-cost">
+      Transaction cost:
+      <strong>Ksh {{ "%.2f"|format(user.transaction_cost) }}</strong>
+    </div>
+
+    <!-- ID row -->
+    <div class="receipt-id-row">
+      <span class="id-label">ID:</span>
+      <span class="id-value">{{ user.code }}</span>
+
+      <button class="copy-btn" type="button" data-copy="{{ user.code }}">
+        <svg viewBox="0 0 24 24">
+          <rect x="9" y="9" width="10" height="10" rx="2"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span>Copy</span>
+      </button>
+    </div>
+
+    <!-- Recipient box -->
     <div class="recipient-card dark-recipient">
+
       <div class="recipient-label">Send to:</div>
+
       <div class="recipient-row">
-        <div class="avatar dark-avatar">{{ user.display_name[:2]|upper }}</div>
-        <div class="recipient-meta">
-          <div class="recipient-name">{{ user.recipient_name or user.display_name }}</div>
-          <div class="recipient-phone">{{ user.contact_masked }}</div>
+
+        <div class="avatar dark-avatar">
+          {{ user.display_name[:2]|upper }}
         </div>
+
+        <div class="recipient-meta">
+          <div class="recipient-name">
+            {{ user.recipient_name or user.display_name }}
+          </div>
+
+          <div class="recipient-phone">
+            {{ user.contact_masked }}
+          </div>
+        </div>
+
       </div>
     </div>
 
+    <!-- OPTIONAL NOTE -->
     {% if user.receipt_note %}
-    <div class="note-box dark-note">{{ user.receipt_note }}</div>
+    <div class="note-box dark-note">
+      {{ user.receipt_note }}
+    </div>
     {% endif %}
 
-    <div class="receipt-actions-grid">
-      <button class="receipt-action-btn receipt-action-fav" type="button" data-fav="{{ user.public_key }}" aria-label="Add to favourites">
-        <span class="receipt-action-graphic" aria-hidden="true">
-          <svg viewBox="0 0 64 64" role="img" focusable="false">
-            <path d="M32 12.5l5.6 11.3 12.5 1.8-9 8.8 2.1 12.5L32 40.1l-11.2 6.8 2.1-12.5-9-8.8 12.5-1.8z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
+    <!-- ACTION ROW -->
+    <!-- 4 columns kept, but only 1st and 3rd are visible -->
+    <div class="receipt-actions-grid receipt-actions-grid-two">
+
+      <!-- COLUMN 1: ADD TO FAVOURITES -->
+      <button class="receipt-action-btn receipt-action-fav"
+              type="button"
+              data-fav="{{ user.public_key }}"
+              aria-label="Add to favourites">
+
+        <span class="receipt-action-graphic">
+          <svg viewBox="0 0 64 64">
+            <path d="M32 12.5l5.6 11.3 12.5 1.8-9 8.8 2.1 12.5L32 40.1l-11.2 6.8 2.1-12.5-9-8.8 12.5-1.8z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3.5"
+                  stroke-linejoin="round"/>
           </svg>
         </span>
-        <span class="receipt-action-label"><span>Add to</span><span>favourites</span></span>
+
+        <span class="receipt-action-label">
+          <span>Add to</span>
+          <span>favourites</span>
+        </span>
       </button>
 
-      <button class="receipt-action-btn receipt-action-reverse" type="button" aria-label="Reverse transaction">
-        <span class="receipt-action-graphic" aria-hidden="true">
-          <svg viewBox="0 0 64 64" role="img" focusable="false">
-            <path d="M44 20c-4.3-4.1-9.9-6.3-15.7-6.3-10.1 0-18.7 7.2-20.6 16.7" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M11.7 29.2L7.4 31l1.2-4.8" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M20 44c4.3 4.1 9.9 6.3 15.7 6.3 10.1 0 18.7-7.2 20.6-16.7" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <span class="receipt-action-label"><span>Reverse</span><span>transaction</span></span>
-      </button>
+      <!-- COLUMN 2: invisible spacer -->
+      <div class="receipt-action-spacer" aria-hidden="true"></div>
 
-      <a class="receipt-action-btn receipt-action-download" href="{{ url_for('download_receipt', public_key=user.public_key) }}" aria-label="Download receipt">
-        <span class="receipt-action-graphic" aria-hidden="true">
-          <svg viewBox="0 0 64 64" role="img" focusable="false">
-            <path d="M20 10h18l10 10v34H20z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
-            <path d="M38 10v12h12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
-            <rect x="18" y="29" width="28" height="6" rx="3" fill="#e74b5a" />
+      <!-- COLUMN 3: DOWNLOAD RECEIPT -->
+      <a class="receipt-action-btn receipt-action-download"
+         href="{{ url_for('download_receipt', public_key=user.public_key) }}"
+         aria-label="Download receipt">
+
+        <span class="receipt-action-graphic">
+          <svg viewBox="0 0 64 64">
+            <path d="M20 10h18l10 10v34H20z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3.5"
+                  stroke-linejoin="round"/>
+            <path d="M38 10v12h12"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3.5"
+                  stroke-linejoin="round"/>
+            <rect x="18" y="29" width="28" height="6" rx="3" fill="#FF3B30"/>
           </svg>
         </span>
-        <span class="receipt-action-label"><span>Download</span><span>receipt</span></span>
+
+        <span class="receipt-action-label">
+          <span>Download</span>
+          <span>receipt</span>
+        </span>
       </a>
 
-      <button class="receipt-action-btn receipt-action-share" type="button" aria-label="Share details">
-        <span class="receipt-action-graphic" aria-hidden="true">
-          <svg viewBox="0 0 64 64" role="img" focusable="false">
-            <path d="M32 39V17" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round"/>
-            <path d="M24 25l8-8 8 8" fill="none" stroke="#ff7a45" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M18 38v10h28V38" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <span class="receipt-action-label"><span>Share</span><span>details</span></span>
-      </button>
+      <!-- COLUMN 4: invisible spacer -->
+      <div class="receipt-action-spacer" aria-hidden="true"></div>
+
     </div>
 
-    <a class="done-btn receipt-done" href="{{ url_for('user_messages', public_key=user.public_key) }}">Done</a>
+    <!-- DONE BUTTON -->
+    <a class="done-btn receipt-done"
+       href="{{ url_for('user_messages', public_key=user.public_key) }}">
+      Done
+    </a>
+
   </article>
+
 </section>
+
 {% endblock %}
