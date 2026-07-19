@@ -1,14 +1,60 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="hero-grid">
-  <div class="hero-card">
-    <div class="hero-kicker">Public site + PWA</div>
-    <h1>Register first, then open your private home.</h1>
-    <p>Create a personal record, keep it private, and receive a receipt page plus one-way messages tied only to that user.</p>
+<section class="home-grid">
+  <div class="home-card hero-card clean-hero">
+    <div class="hero-kicker">Private access</div>
+    <h1>Register first, wait for approval, then build your receipt.</h1>
+    <p>The homepage stays simple: create your account, let admin approve it, and then open a clean receipt page and one-way messages inbox.</p>
 
-    <div class="app-cta-row">
-      <a class="chip app-cta" href="{{ url_for('receipt_app') }}">Download receipt app</a>
-      <a class="chip app-cta" href="{{ url_for('sms_app') }}">Download SMS app</a>
+    <div class="home-actions">
+      <a class="primary" href="#register">Create account</a>
+      <a class="chip" href="{{ url_for('receipt_app') }}">Receipt app</a>
+      <a class="chip" href="{{ url_for('sms_app') }}">SMS app</a>
+    </div>
+  </div>
+
+  <div class="home-card">
+    <div class="mini-strip compact">
+      <div class="strip-card">
+        <span class="strip-title">1</span>
+        <strong>Register</strong>
+        <span>Save a private profile</span>
+      </div>
+      <div class="strip-card">
+        <span class="strip-title">2</span>
+        <strong>Approve</strong>
+        <span>Admin unlocks access</span>
+      </div>
+      <div class="strip-card">
+        <span class="strip-title">3</span>
+        <strong>Generate</strong>
+        <span>Build receipt + inbox</span>
+      </div>
+    </div>
+
+    <div class="preview-plate" style="margin-top:16px;">
+      <div class="preview-badge">🧾</div>
+      <div>
+        <div class="preview-title">Receipt space</div>
+        <div class="preview-sub">Dark transaction card and installable app shell</div>
+      </div>
+    </div>
+
+    <div class="preview-plate" style="margin-top:12px;">
+      <div class="preview-badge">💬</div>
+      <div>
+        <div class="preview-title">Messages space</div>
+        <div class="preview-sub">Five one-way SMS style notices, replies off</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-card full-width-card" id="register">
+    <div class="section-head">
+      <div>
+        <h2>New account</h2>
+        <p>Enter your details once. The record stays pending until admin approves it.</p>
+      </div>
     </div>
 
     <form id="register" class="entry-form" action="{{ url_for('register') }}" method="post">
@@ -41,41 +87,26 @@
       </label>
       <button class="primary full" type="submit">Create pending record</button>
     </form>
-    <p class="tiny">Approved users can open their own receipt and messages pages. Unapproved users see a pending screen.</p>
   </div>
 
-  <div class="side-stack">
-    <div class="mini-card accent-panel">
-      <h3>Receipt preview</h3>
-      <div class="preview-plate">
-        <div class="preview-badge">✦</div>
-        <div>
-          <div class="preview-title">Custom receipt view</div>
-          <div class="preview-sub">Personal branding, not a copy.</div>
-        </div>
+  <div class="home-card full-width-card">
+    <div class="section-head">
+      <div>
+        <h2>Returning user login</h2>
+        <p>Use the same name and contact to open the private page after approval.</p>
       </div>
     </div>
-    <div class="mini-card accent-panel">
-      <h3>Messages app</h3>
-      <p>One-way messages only. Admin can add, edit, pin, or remove them per user.</p>
-    </div>
-    <div class="mini-card accent-panel">
-      <h3>Reference bands</h3>
-      <div class="band-list">
-        <div>0–30 = 5</div>
-        <div>50–65 = 20</div>
-        <div>66–75 = 35</div>
-        <div>76–100 = 45</div>
-        <div>100–130 = 60</div>
-        <div>131–165 = 70</div>
-        <div>165–200 = 80</div>
-        <div>Above 200 = 100</div>
-      </div>
-    </div>
-    <div class="mini-card accent-panel">
-      <h3>Offline shell</h3>
-      <p>The PWA caches the app shell so the experience keeps loading offline after first visit.</p>
-    </div>
+    <form class="login-form" action="{{ url_for('login_user') }}" method="post">
+      <label class="full">
+        <span>Name</span>
+        <input name="display_name" placeholder="Murima 01" required>
+      </label>
+      <label class="full">
+        <span>Contact</span>
+        <input name="contact" placeholder="0712345678" required>
+      </label>
+      <button class="primary full" type="submit">Log in</button>
+    </form>
   </div>
 </section>
 {% endblock %}

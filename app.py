@@ -359,6 +359,33 @@ def fetch_user(public_key: str):
     return db().execute("SELECT * FROM users WHERE public_key = ?", (public_key,)).fetchone()
 
 
+def seed_default_messages(public_key: str) -> None:
+    user = fetch_user(public_key)
+    if not user:
+        return
+    conn = db()
+    existing = conn.execute(
+        "SELECT COUNT(*) AS c FROM messages WHERE user_public_key = ?",
+        (public_key,),
+    ).fetchone()["c"]
+    if existing:
+        return
+    now = now_iso()
+    defaults = [
+        ("System", "Your account is now under review. Please wait for admin approval before generating the receipt."),
+        ("Support", "Approval received. You can now complete your receipt details from your private page."),
+        ("Payments Desk", "Transaction draft created successfully. Final receipt will appear after you save the details."),
+        ("Notifications", "This inbox is one-way only. Replies are disabled to keep it clean and read-only."),
+        ("Ledger Update", "All five sample messages are ready and will stay in the inbox until you remove them from the admin dashboard."),
+    ]
+    for sender_name, body in defaults:
+        conn.execute(
+            "INSERT INTO messages (user_public_key, sender_name, body, created_at, pinned) VALUES (?, ?, ?, ?, 0)",
+            (public_key, sender_name, body, now),
+        )
+    conn.commit()
+
+
 
 def admin_is_authenticated() -> bool:
     token = request.cookies.get("admin_auth") or ""
@@ -508,6 +535,9 @@ def user_home(public_key):
         abort(404)
     if not user["approved"]:
         return render_template("public_approval.html", user=user, settings=get_settings())
+
+    seed_default_messages(public_key)
+    user = fetch_user(public_key)
     messages = db().execute(
         "SELECT * FROM messages WHERE user_public_key = ? ORDER BY pinned DESC, id DESC",
         (public_key,),
@@ -528,6 +558,7 @@ def user_home(public_key):
         printable=False,
         download_count=download_count,
         referral_count=referral_count,
+        editable=True,
     )
 
 
@@ -544,6 +575,37 @@ def user_messages(public_key):
         (public_key,),
     ).fetchall()
     return render_template("messages.html", user=user, messages=messages, settings=get_settings())
+
+
+@app.route("/u/<public_key>/receipt", methods=["POST"])
+@require_registered_user
+def save_receipt(public_key):
+    user = fetch_user(public_key)
+    if not user:
+        abort(404)
+    if not user["approved"]:
+        return render_template("public_approval.html", user=user, settings=get_settings())
+
+    amount = safe_float(request.form.get("amount"), float(user["amount"]))
+    receipt_time = parse_datetime_input(request.form.get("receipt_time") or user["receipt_time"])
+    receipt_note = (request.form.get("receipt_note") or "").strip()
+    contact = (request.form.get("contact") or user["contact"]).strip()
+    contact_masked = mask_contact(contact)
+    code = build_code(user["display_name"], contact, receipt_time)
+    balance = max(0.0, round(10000.0 - amount, 2))
+
+    db().execute(
+        """
+        UPDATE users
+        SET contact = ?, contact_masked = ?, amount = ?, receipt_time = ?, balance = ?, code = ?, receipt_note = ?, updated_at = ?
+        WHERE public_key = ?
+        """,
+        (contact, contact_masked, amount, receipt_time, balance, code, receipt_note, now_iso(), public_key),
+    )
+    db().commit()
+    seed_default_messages(public_key)
+    flash("Receipt details saved.", "success")
+    return redirect(url_for("user_home", public_key=public_key))
 
 
 @app.route("/u/<public_key>/download")
@@ -570,12 +632,7 @@ def download_receipt(public_key):
         ),
     )
     db().commit()
-
-    html = render_template("receipt.html", user=user, messages=[], settings=get_settings(), printable=True, download_count=0, referral_count=0)
-    response = make_response(html)
-    response.headers["Content-Disposition"] = f'inline; filename="{user["public_key"]}-receipt.html"'
-    response.headers["Content-Type"] = "text/html; charset=utf-8"
-    return response
+    return redirect(url_for("receipt_app", key=public_key))
 
 
 @app.route("/receipt-app")
@@ -698,6 +755,7 @@ def admin_dashboard():
 def approve_user(public_key):
     db().execute("UPDATE users SET approved = 1, updated_at = ? WHERE public_key = ?", (now_iso(), public_key))
     db().commit()
+    seed_default_messages(public_key)
     flash("User approved.", "success")
     return redirect(url_for("admin_dashboard"))
 

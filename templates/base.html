@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#b80f25">
+  <meta name="theme-color" content="#0e0f12">
   <title>{{ settings.site_name if settings else app_name }}</title>
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
@@ -17,14 +17,13 @@
       <div class="brand-mark">M</div>
       <div>
         <div class="brand-title">{{ settings.site_name if settings else app_name }}</div>
-        <div class="brand-subtitle">{{ settings.brand_subtitle if settings else 'Personal transaction studio' }}</div>
+        <div class="brand-subtitle">{{ settings.brand_subtitle if settings else 'Private transaction studio' }}</div>
       </div>
     </div>
     {% if request.cookies.get('user_key') %}
     <div class="toplinks">
       <a href="{{ url_for('index') }}">Home</a>
-      <a href="{{ url_for('receipt_app') }}">Receipt app</a>
-      <a href="{{ url_for('sms_app') }}">SMS app</a>
+      <a href="{{ url_for('user_messages', public_key=request.cookies.get('user_key')) }}">Messages</a>
     </div>
     {% endif %}
   </header>

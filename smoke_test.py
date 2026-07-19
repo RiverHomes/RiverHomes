@@ -1,1 +1,1 @@
-print('smoke')
+print("ok")

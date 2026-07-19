@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="card wide center narrow">
+<section class="home-card approval-card center narrow">
   <div class="status-icon">⌛</div>
-  <h1>Pending approval</h1>
-  <p>{{ user.display_name }} has been saved, but access is locked until the admin approves it.</p>
-  <div class="muted">Private key: {{ user.public_key }}</div>
-  <div class="muted">Referral link: {{ request.host_url.rstrip('/') }}{{ url_for('index') }}?ref={{ user.public_key }}</div>
+  <h1>Waiting for approval</h1>
+  <p>{{ user.display_name }} is saved, but the private pages stay locked until the admin approves the account.</p>
+  <div class="muted">Key: {{ user.public_key }}</div>
+  <div class="muted">Once approved, the receipt editor and inbox open automatically.</div>
 </section>
 {% endblock %}

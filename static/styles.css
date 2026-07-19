@@ -150,3 +150,78 @@ button:active,a:active{transform:translateY(1px)}
   .receipt-wrap{max-width:none;padding:0}
   .receipt-card{box-shadow:none;border:1px solid #ddd;background:white;color:black}
 }
+
+
+/* Clean home + app shells */
+:root{
+  --page:#0f1115;
+  --panel-dark:#171a21;
+  --panel-mid:#1d2129;
+  --panel-soft:#242833;
+  --green:#2dd86f;
+  --green-2:#0fb34f;
+  --blue:#2997ff;
+  --orange:#ff8a3d;
+  --receipt-text:#f4f7fb;
+}
+html,body{background:linear-gradient(180deg,#0f1115 0%, #151922 100%);color:#eef2f7}
+.topbar{background:linear-gradient(to bottom, rgba(15,17,21,.98), rgba(15,17,21,.72), transparent)}
+.brand-title,.brand-subtitle,.toplinks a,.hero-card p,.preview-sub,.tiny,.subhead,.receipt-date,.receipt-cost,.receipt-code,.note-box,.panel-head p,.thread-head p,.contact-preview,.recipient-phone,.muted,.empty-state,.empty-thread,.log-row small,.log-meta{color:#aeb6c2}
+.toplinks a{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06);color:#e3e7ef}
+.home-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+.home-card{background:linear-gradient(180deg, rgba(27,31,39,.96), rgba(21,24,31,.96));border:1px solid rgba(255,255,255,.06);box-shadow:0 20px 60px rgba(0,0,0,.24);border-radius:30px;padding:24px}
+.clean-hero h1{max-width:15ch}
+.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px}
+.section-head h2{margin:0 0 6px}
+.section-head p{margin:0;color:#aeb6c2}
+.home-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.home-actions .chip,.home-actions .primary{min-width:160px}
+.compact{grid-template-columns:repeat(3,1fr)}
+.full-width-card{grid-column:1/-1}
+.entry-form,.settings-grid,.login-form,.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.entry-form label,.settings-grid label,.login-form label,.editor-grid label{display:grid;gap:8px}
+.entry-form input,.settings-grid input,.settings-grid textarea,.login-form input,.contact-search input,.settings-grid select,.editor-grid input{width:100%;padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:#12151b;color:#f2f5fb;outline:none}
+.entry-form input:focus,.settings-grid input:focus,.settings-grid textarea:focus,.login-form input:focus,.contact-search input:focus,.settings-grid select:focus,.editor-grid input:focus{border-color:rgba(41,151,255,.45);box-shadow:0 0 0 4px rgba(41,151,255,.08)}
+.primary,.done-btn{background:linear-gradient(135deg,var(--green),var(--green-2));color:#09110b;box-shadow:0 16px 30px rgba(45,216,111,.18)}
+.chip,.ghost-btn,.icon-btn,.circle-action,.receipt-action-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#eef2f7}
+.receipt-shell{max-width:760px;margin:0 auto;display:grid;gap:14px}
+.receipt-top-actions{display:flex;justify-content:space-between;align-items:center;padding:0 6px}
+.circle-action{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-weight:800}
+.receipt-editor{background:rgba(20,23,29,.92);border:1px solid rgba(255,255,255,.06);border-radius:28px;padding:18px}
+.editor-title{font-weight:800;margin-bottom:10px}
+.receipt-card.dark-receipt{background:#191c22;border:1px solid rgba(255,255,255,.05);color:var(--receipt-text);border-radius:34px;box-shadow:0 30px 80px rgba(0,0,0,.36);padding-top:24px}
+.receipt-card.dark-receipt .receipt-topline{background:linear-gradient(90deg,var(--blue),var(--green));height:3px}
+.receipt-top-icon{width:120px;height:120px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;background:#11131a;border:2px solid rgba(255,255,255,.08);font-size:3rem}
+.receipt-card.dark-receipt h1{margin:0;text-align:center;color:#fff;font-size:2.1rem;line-height:1.05}
+.receipt-card.dark-receipt .subhead{text-align:center;margin-top:12px}
+.receipt-amount{font-size:clamp(2.4rem,6vw,4rem);font-weight:900;margin:18px 0 8px;color:#fff;text-align:center}
+.receipt-cost,.receipt-code{text-align:center}
+.receipt-code{display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap}
+.receipt-code span{color:#30e06f;font-weight:800}
+.text-copy{background:none;border:0;color:#30e06f;font-weight:700;cursor:pointer}
+.dark-recipient,.dark-note{background:#22262f;border-color:rgba(255,255,255,.06);color:#e8edf4}
+.recipient-card.dark-recipient{max-width:520px;margin:18px auto 0;padding:18px;border-radius:22px}
+.recipient-label{color:#c2c8d2;margin-bottom:10px}
+.recipient-row{display:flex;align-items:center;gap:14px}
+.dark-avatar{background:#8b4f22;color:#ffb26f}
+.recipient-name{color:#fff;font-weight:900;font-size:1.12rem}
+.recipient-phone{color:#c7ced8}
+.note-box.dark-note{max-width:520px;margin:16px auto 0}
+.receipt-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px auto 0;max-width:520px}
+.receipt-action-btn{min-height:68px;border-radius:20px;display:grid;place-items:center;gap:6px;padding:12px;border:1px solid rgba(255,255,255,.08);text-align:center}
+.receipt-action-icon{font-size:1.2rem;color:#2dd86f}
+.receipt-done{max-width:100%;margin-top:16px;font-size:1rem}
+.messages-shell.clean-messages{grid-template-columns:.92fr 1.08fr}
+.contacts-panel,.thread-panel{background:linear-gradient(180deg, rgba(24,28,36,.96), rgba(18,21,28,.96));border:1px solid rgba(255,255,255,.06);color:#eef2f7}
+.contact-row{background:rgba(255,255,255,.03);border-color:transparent}
+.contact-row:hover{background:rgba(255,255,255,.06)}
+.bubble{background:#1a1d25;border-color:rgba(255,255,255,.05)}
+.bubble.pinned{background:#202531;border-color:rgba(45,216,111,.22)}
+.install-shell{display:grid;place-items:center;min-height:60vh}
+.install-card{max-width:560px;width:100%;background:linear-gradient(180deg, rgba(24,28,36,.96), rgba(18,21,28,.96));border:1px solid rgba(255,255,255,.06);border-radius:32px;padding:28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.28)}
+.install-icon{width:96px;height:96px;margin:0 auto 14px;border-radius:28px;display:grid;place-items:center;background:rgba(255,255,255,.05);font-size:2.2rem}
+@media (max-width: 960px){
+  .home-grid,.messages-shell.clean-messages{grid-template-columns:1fr}
+  .compact,.entry-form,.settings-grid,.login-form,.editor-grid,.receipt-actions-grid{grid-template-columns:1fr}
+  .section-head{flex-direction:column}
+}

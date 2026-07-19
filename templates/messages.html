@@ -1,17 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="messages-shell">
+<section class="messages-shell clean-messages">
   <aside class="contacts-panel">
     <div class="panel-head">
       <div>
         <h1>{{ settings.message_heading }}</h1>
-        <p>One-way conversations only. Replies are disabled.</p>
+        <p>Five one-way SMS style updates. Replies remain off.</p>
       </div>
-      <div class="pill">{{ messages|length }} items</div>
-    </div>
-
-    <div class="contact-search">
-      <input id="contactSearch" placeholder="Search messages">
+      <div class="pill">{{ messages|length }} messages</div>
     </div>
 
     <div class="contact-list" id="contactList">
@@ -20,7 +16,7 @@
         <div class="avatar small">{{ msg.sender_name[:2]|upper }}</div>
         <div class="contact-copy">
           <div class="contact-name">{{ msg.sender_name }}</div>
-          <div class="contact-preview">{{ msg.body[:54] }}</div>
+          <div class="contact-preview">{{ msg.body[:64] }}</div>
         </div>
       </button>
       {% endfor %}

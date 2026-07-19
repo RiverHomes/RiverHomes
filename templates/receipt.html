@@ -1,66 +1,64 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="receipt-wrap {% if printable %}printable{% endif %}">
-  <div class="receipt-actions">
-    <a class="icon-btn" href="{{ url_for('index') }}">✕</a>
-    <a class="icon-btn" href="{{ url_for('user_home', public_key=user.public_key) }}">↻</a>
+<section class="receipt-shell {% if printable %}printable{% endif %}">
+  <div class="receipt-top-actions">
+    <a class="circle-action" href="{{ url_for('index') }}">✕</a>
+    <a class="circle-action" href="{{ url_for('user_home', public_key=user.public_key) }}">⇪</a>
   </div>
 
-  <article class="receipt-card">
+  {% if editable and not printable %}
+  <form class="receipt-editor" action="{{ url_for('save_receipt', public_key=user.public_key) }}" method="post">
+    <div class="editor-title">Generate receipt</div>
+    <div class="editor-grid">
+      <label><span>Contact</span><input name="contact" value="{{ user.contact }}"></label>
+      <label><span>Amount</span><input name="amount" type="number" step="0.01" value="{{ '%.2f'|format(user.amount) }}"></label>
+      <label><span>Date & time</span><input name="receipt_time" value="{{ user.receipt_time }}"></label>
+      <label class="full"><span>Note</span><input name="receipt_note" value="{{ user.receipt_note }}"></label>
+      <button class="primary full" type="submit">Generate receipt</button>
+    </div>
+  </form>
+  {% endif %}
+
+  <article class="receipt-card dark-receipt">
     <div class="receipt-topline"></div>
 
-    <div class="receipt-emblem">✓</div>
+    <div class="receipt-top-icon">🎉</div>
 
-    <h1>{{ settings.receipt_heading }}</h1>
-    <p class="subhead">{{ settings.receipt_subheading }}</p>
-
-    <div class="receipt-date">{{ user.receipt_time }}</div>
+    <h1>Your transaction<br>was successful</h1>
+    <p class="subhead">{{ user.receipt_time }}</p>
 
     <div class="receipt-amount">Ksh {{ "%.2f"|format(user.amount) }}</div>
     <div class="receipt-cost">Transaction cost: <strong>Ksh {{ "%.2f"|format(user.transaction_cost) }}</strong></div>
 
-    <div class="receipt-code">ID: <span>{{ user.code }}</span> <button class="text-copy" data-copy="{{ user.code }}">Copy</button></div>
+    <div class="receipt-code">ID: <span>{{ user.code }}</span> <button class="text-copy" data-copy="{{ user.code }}">⧉ Copy</button></div>
 
-    <div class="recipient-card">
-      <div class="avatar">{{ user.display_name[:2]|upper }}</div>
-      <div class="recipient-meta">
-        <div class="recipient-label">Send to:</div>
-        <div class="recipient-name">{{ user.display_name }}</div>
-        <div class="recipient-phone">Phone number: {{ user.contact_masked }}</div>
+    <div class="recipient-card dark-recipient">
+      <div class="recipient-label">Send to:</div>
+      <div class="recipient-row">
+        <div class="avatar dark-avatar">{{ user.display_name[:2]|upper }}</div>
+        <div class="recipient-meta">
+          <div class="recipient-name">{{ user.display_name }}</div>
+          <div class="recipient-phone">{{ user.contact_masked }}</div>
+        </div>
       </div>
     </div>
 
     {% if user.receipt_note %}
-    <div class="note-box">{{ user.receipt_note }}</div>
+    <div class="note-box dark-note">{{ user.receipt_note }}</div>
     {% endif %}
 
-    <div class="action-row">
-      <button class="ghost-btn" data-fav="{{ user.public_key }}">☆ Add to favourites</button>
-      <a class="ghost-btn" href="{{ url_for('download_receipt', public_key=user.public_key) }}">⬇ Download receipt</a>
+    <div class="receipt-actions-grid">
+      <button class="receipt-action-btn" data-fav="{{ user.public_key }}">
+        <span class="receipt-action-icon">☆</span>
+        <span>Add to favourites</span>
+      </button>
+      <a class="receipt-action-btn" href="{{ url_for('download_receipt', public_key=user.public_key) }}">
+        <span class="receipt-action-icon">⤓</span>
+        <span>Download receipt</span>
+      </a>
     </div>
 
-    <div class="receipt-stats">
-      <div><strong>{{ download_count or 0 }}</strong><span>Downloads</span></div>
-      <div><strong>{{ referral_count or 0 }}</strong><span>Referrals</span></div>
-      <div><strong>{{ user.public_key }}</strong><span>Receipt key</span></div>
-    </div>
-
-    <a class="done-btn" href="{{ url_for('user_messages', public_key=user.public_key) }}">Open messages</a>
+    <a class="done-btn receipt-done" href="{{ url_for('user_messages', public_key=user.public_key) }}">Done</a>
   </article>
-
-  <section class="mini-strip">
-    <div class="strip-card">
-      <span class="strip-title">Status</span>
-      <strong>{{ "Approved" if user.approved else "Pending" }}</strong>
-    </div>
-    <div class="strip-card">
-      <span class="strip-title">Balance</span>
-      <strong>Ksh {{ "%.2f"|format(user.balance) }}</strong>
-    </div>
-    <div class="strip-card">
-      <span class="strip-title">Referral link</span>
-      <strong>{{ request.host_url.rstrip('/') }}{{ url_for('index') }}?ref={{ user.public_key }}</strong>
-    </div>
-  </section>
 </section>
 {% endblock %}

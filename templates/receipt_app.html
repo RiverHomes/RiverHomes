@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="card wide center narrow">
-  <div class="status-icon">🧾</div>
-  <h1>Receipt app</h1>
-  <p>Open the receipt experience in PWA style, then register to unlock a private page for each user.</p>
-  <div class="link-row">
-    <a class="primary" href="{{ url_for('index') }}#register">Register now</a>
-    <a class="chip" href="{{ url_for('index') }}">Go home</a>
+<section class="install-shell">
+  <div class="install-card">
+    <div class="install-icon">🧾</div>
+    <h1>Receipt app</h1>
+    <p>This page exists only to install the receipt PWA shell. It does not show a receipt.</p>
+    <div class="link-row">
+      <a class="primary" href="{{ url_for('index') }}">Back to home</a>
+      <a class="chip" href="{{ url_for('index') }}#register">Create account</a>
+    </div>
   </div>
 </section>
 {% endblock %}
