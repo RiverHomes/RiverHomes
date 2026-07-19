@@ -35,6 +35,17 @@
     });
   });
 
+
+  const extraActionButtons = document.querySelectorAll('.receipt-action-reverse, .receipt-action-share');
+  extraActionButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const label = btn.getAttribute('aria-label') || 'Action';
+      btn.classList.add('action-pulse');
+      setTimeout(() => btn.classList.remove('action-pulse'), 350);
+      console.log(label);
+    });
+  });
+
   const contactSearch = document.getElementById('contactSearch');
   const contactList = document.getElementById('contactList');
   if (contactSearch && contactList) {

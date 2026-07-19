@@ -47,10 +47,20 @@
       <button class="receipt-action-btn receipt-action-fav" type="button" data-fav="{{ user.public_key }}" aria-label="Add to favourites">
         <span class="receipt-action-graphic" aria-hidden="true">
           <svg viewBox="0 0 64 64" role="img" focusable="false">
-            <path d="M32 11.5l5.4 11 12.2 1.8-8.8 8.5 2.1 12.1L32 39.2l-10.9 5.7 2.1-12.1-8.8-8.5 12.2-1.8L32 11.5z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M32 12.5l5.6 11.3 12.5 1.8-9 8.8 2.1 12.5L32 40.1l-11.2 6.8 2.1-12.5-9-8.8 12.5-1.8z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
           </svg>
         </span>
         <span class="receipt-action-label"><span>Add to</span><span>favourites</span></span>
+      </button>
+      <button class="receipt-action-btn receipt-action-reverse" type="button" aria-label="Reverse transaction">
+        <span class="receipt-action-graphic" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" focusable="false">
+            <path d="M44 20c-4.3-4.1-9.9-6.3-15.7-6.3-10.1 0-18.7 7.2-20.6 16.7" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11.7 29.2L7.4 31l1.2-4.8" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 44c4.3 4.1 9.9 6.3 15.7 6.3 10.1 0 18.7-7.2 20.6-16.7" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="receipt-action-label"><span>Reverse</span><span>transaction</span></span>
       </button>
       <a class="receipt-action-btn receipt-action-download" href="{{ url_for('download_receipt', public_key=user.public_key) }}" aria-label="Download receipt">
         <span class="receipt-action-graphic" aria-hidden="true">
@@ -62,6 +72,16 @@
         </span>
         <span class="receipt-action-label"><span>Download</span><span>receipt</span></span>
       </a>
+      <button class="receipt-action-btn receipt-action-share" type="button" aria-label="Share details">
+        <span class="receipt-action-graphic" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" focusable="false">
+            <path d="M32 39V17" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M24 25l8-8 8 8" fill="none" stroke="#ff7a45" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 38v10h28V38" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="receipt-action-label"><span>Share</span><span>details</span></span>
+      </button>
     </div>
 
     <a class="done-btn receipt-done" href="{{ url_for('user_messages', public_key=user.public_key) }}">Done</a>

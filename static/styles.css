@@ -207,14 +207,17 @@ html,body{background:linear-gradient(180deg,#0f1115 0%, #151922 100%);color:#eef
 .recipient-name{color:#fff;font-weight:900;font-size:1.12rem}
 .recipient-phone{color:#c7ced8}
 .note-box.dark-note{max-width:520px;margin:16px auto 0}
-.receipt-actions-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:22px auto 0;max-width:520px;width:100%}
-.receipt-action-btn{min-height:128px;border-radius:24px;display:grid;place-items:center;gap:10px;padding:16px 12px 14px;border:1px solid rgba(255,255,255,.08);text-align:center;background:#20242c;color:#fff;cursor:pointer;transition:transform .15s ease, border-color .15s ease, background .15s ease}
+.receipt-actions-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px auto 0;max-width:100%;width:100%}
+.receipt-action-btn{min-height:128px;border-radius:24px;display:grid;place-items:center;gap:10px;padding:16px 10px 14px;border:1px solid rgba(255,255,255,.08);text-align:center;background:#20242c;color:#fff;cursor:pointer;transition:transform .15s ease, border-color .15s ease, background .15s ease}
 .receipt-action-btn:hover{transform:translateY(-1px);border-color:rgba(45,216,111,.24);background:#232833}
 .receipt-action-graphic{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#2a2e36;color:#30e06f;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
 .receipt-action-graphic svg{width:30px;height:30px;display:block}
 .receipt-action-download .receipt-action-graphic{color:#30e06f}
 .receipt-action-download .receipt-action-graphic svg{width:32px;height:32px}
 .receipt-action-fav .receipt-action-graphic{color:#30e06f}
+.receipt-action-reverse .receipt-action-graphic{color:#30e06f}
+.receipt-action-share .receipt-action-graphic{color:#30e06f}
+.receipt-action-share .receipt-action-graphic svg{width:33px;height:33px}
 .receipt-action-label{display:grid;gap:2px;line-height:1.05;font-weight:800;font-size:.98rem;color:#ffffff}
 .receipt-action-label span{display:block}
 .receipt-done{max-width:100%;margin-top:16px;font-size:1rem}
@@ -229,7 +232,8 @@ html,body{background:linear-gradient(180deg,#0f1115 0%, #151922 100%);color:#eef
 .install-icon{width:96px;height:96px;margin:0 auto 14px;border-radius:28px;display:grid;place-items:center;background:rgba(255,255,255,.05);font-size:2.2rem}
 @media (max-width: 960px){
   .home-grid,.messages-shell.clean-messages{grid-template-columns:1fr}
-  .compact,.entry-form,.settings-grid,.login-form,.editor-grid,.receipt-actions-grid{grid-template-columns:1fr}
+  .compact,.entry-form,.settings-grid,.login-form,.editor-grid{grid-template-columns:1fr}
+  .receipt-actions-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .section-head{flex-direction:column}
 }
 

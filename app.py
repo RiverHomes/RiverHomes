@@ -348,25 +348,48 @@ def render_receipt_png(user):
     if data["receipt_note"]:
         draw.rounded_rectangle((170, 1260, 1230, 1370), radius=24, fill="#232831")
         draw.text((210, 1300), data["receipt_note"], font=f_mid, fill="#d9dee7")
-    # Bottom row: two centered actions plus Done.
-    left_btn = (170, 1420, 520, 1560)
-    right_btn = (560, 1420, 910, 1560)
-    done_btn = (370, 1600, 1030, 1676)
-    for box in (left_btn, right_btn):
+    # Bottom row: four evenly spaced actions plus Done.
+    btn_y0, btn_y1 = 1418, 1560
+    left_pad, right_pad, gap = 140, 140, 22
+    usable = 1400 - left_pad - right_pad - gap * 3
+    btn_w = usable // 4
+    boxes = []
+    x = left_pad
+    for _ in range(4):
+        boxes.append((x, btn_y0, x + btn_w, btn_y1))
+        x += btn_w + gap
+    done_btn = (280, 1600, 1120, 1678)
+    for box in boxes:
         draw.rounded_rectangle(box, radius=26, fill="#20242d")
+    centers = [int((b[0] + b[2]) / 2) for b in boxes]
+    icon_y = 1488
+    text_y = 1528
     # Add to favourites icon (outlined star)
-    cx, cy = 345, 1490
-    draw.ellipse((cx - 29, cy - 29, cx + 29, cy + 29), fill="#2a2e36")
-    star = [(345, 1453), (352, 1466), (368, 1468), (356, 1478), (360, 1494), (345, 1486), (330, 1494), (334, 1478), (322, 1468), (338, 1466)]
+    cx = centers[0]
+    draw.ellipse((cx - 29, icon_y - 29, cx + 29, icon_y + 29), fill="#2a2e36")
+    star = [(cx, 1453), (cx + 7, 1466), (cx + 23, 1468), (cx + 11, 1478), (cx + 15, 1494), (cx, 1486), (cx - 15, 1494), (cx - 11, 1478), (cx - 23, 1468), (cx - 7, 1466)]
     draw.line(star + [star[0]], fill="#30e06f", width=4, joint="curve")
-    draw.multiline_text((345, 1528), "Add to\nfavourites", font=f_small, fill="#ffffff", anchor="ma", align="center", spacing=4)
+    draw.multiline_text((cx, text_y), "Add to\nfavourites", font=f_small, fill="#ffffff", anchor="ma", align="center", spacing=4)
+    # Reverse transaction icon (counter-clockwise arrow)
+    cx = centers[1]
+    draw.ellipse((cx - 29, icon_y - 29, cx + 29, icon_y + 29), fill="#2a2e36")
+    draw.arc((cx - 18, icon_y - 18, cx + 18, icon_y + 18), start=35, end=325, fill="#30e06f", width=4)
+    draw.polygon([(cx - 11, icon_y - 16), (cx - 23, icon_y - 13), (cx - 16, icon_y - 4)], fill="#30e06f")
+    draw.multiline_text((cx, text_y), "Reverse\ntransaction", font=f_small, fill="#ffffff", anchor="ma", align="center", spacing=4)
     # Download receipt icon (document outline + red bar)
-    cx, cy = 735, 1490
-    draw.ellipse((cx - 29, cy - 29, cx + 29, cy + 29), fill="#2a2e36")
-    draw.polygon([(723, 1471), (741, 1471), (749, 1479), (749, 1507), (723, 1507)], outline="#30e06f", fill=None)
-    draw.line((741, 1471, 741, 1479, 749, 1479), fill="#30e06f", width=3)
-    draw.rounded_rectangle((726, 1486, 746, 1492), radius=2, fill="#e74b5a")
-    draw.multiline_text((735, 1528), "Download\nreceipt", font=f_small, fill="#ffffff", anchor="ma", align="center", spacing=4)
+    cx = centers[2]
+    draw.ellipse((cx - 29, icon_y - 29, cx + 29, icon_y + 29), fill="#2a2e36")
+    draw.polygon([(cx - 12, icon_y - 17), (cx + 6, icon_y - 17), (cx + 14, icon_y - 9), (cx + 14, icon_y + 19), (cx - 12, icon_y + 19)], outline="#30e06f", fill=None)
+    draw.line((cx + 6, icon_y - 17, cx + 6, icon_y - 9, cx + 14, icon_y - 9), fill="#30e06f", width=3)
+    draw.rounded_rectangle((cx - 14, icon_y - 2, cx + 14, icon_y + 4), radius=2, fill="#e74b5a")
+    draw.multiline_text((cx, text_y), "Download\nreceipt", font=f_small, fill="#ffffff", anchor="ma", align="center", spacing=4)
+    # Share details icon (upload/share arrow)
+    cx = centers[3]
+    draw.ellipse((cx - 29, icon_y - 29, cx + 29, icon_y + 29), fill="#2a2e36")
+    draw.line((cx, icon_y + 14, cx, icon_y - 10), fill="#30e06f", width=4)
+    draw.polygon([(cx - 8, icon_y - 3), (cx, icon_y - 15), (cx + 8, icon_y - 3)], outline="#ff7a45", fill=None)
+    draw.line((cx - 14, icon_y + 14, cx + 14, icon_y + 14), fill="#30e06f", width=4)
+    draw.multiline_text((cx, text_y), "Share\ndetails", font=f_small, fill="#ffffff", anchor="ma", align="center", spacing=4)
     draw.rounded_rectangle(done_btn, radius=24, fill="#2dd86f")
     draw.text((700, 1638), "Done", font=_load_font(36, True), fill="#ffffff", anchor="ma")
     return img
