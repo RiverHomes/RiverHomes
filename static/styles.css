@@ -225,3 +225,33 @@ html,body{background:linear-gradient(180deg,#0f1115 0%, #151922 100%);color:#eef
   .compact,.entry-form,.settings-grid,.login-form,.editor-grid,.receipt-actions-grid{grid-template-columns:1fr}
   .section-head{flex-direction:column}
 }
+
+
+/* Mobile-first admin + clean controls */
+.admin-shell{display:grid;gap:14px}
+.admin-quickbar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;position:sticky;top:76px;z-index:5;padding:0 2px}
+.admin-quickbtn{display:grid;place-items:center;min-height:48px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#eef2f7;font-weight:800}
+.admin-section{background:linear-gradient(180deg, rgba(24,28,36,.96), rgba(18,21,28,.96));border:1px solid rgba(255,255,255,.06);border-radius:28px;overflow:hidden}
+.admin-section > summary{list-style:none;padding:16px 18px;font-weight:900;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05)}
+.admin-section > summary::-webkit-details-marker{display:none}
+.admin-card{background:none;border:0;box-shadow:none;padding:18px}
+.admin-stack{display:grid;gap:12px;padding:14px 18px 18px}
+.admin-user-card{padding:18px;border-radius:24px}
+.admin-user-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.admin-action-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.mini-info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.mini-info-grid > div{padding:12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);display:grid;gap:4px}
+.mini-info-grid strong{font-size:.8rem;color:#b9c1cc;text-transform:uppercase;letter-spacing:.06em}
+.mini-info-grid span{font-weight:800}
+.compact-form{margin-top:14px}
+.message-block{margin-top:14px;border:1px solid rgba(255,255,255,.06);border-radius:22px;background:rgba(255,255,255,.02)}
+.message-block > summary{padding:14px 16px;cursor:pointer;font-weight:800}
+.message-block > summary::-webkit-details-marker{display:none}
+.message-block .admin-thread{padding:0 14px 14px}
+.info-strip{padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#aeb6c2}
+@media (max-width: 960px){
+  .admin-quickbar{grid-template-columns:repeat(2,1fr);top:70px}
+  .admin-user-head{flex-direction:column}
+  .admin-action-row{justify-content:flex-start}
+  .mini-info-grid{grid-template-columns:1fr 1fr}
+}

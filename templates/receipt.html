@@ -52,9 +52,13 @@
         <span class="receipt-action-icon">☆</span>
         <span>Add to favourites</span>
       </button>
-      <a class="receipt-action-btn" href="{{ url_for('download_receipt', public_key=user.public_key) }}">
+      <a class="receipt-action-btn" href="{{ url_for('download_receipt_png', public_key=user.public_key) }}">
         <span class="receipt-action-icon">⤓</span>
-        <span>Download receipt</span>
+        <span>Download PNG</span>
+      </a>
+      <a class="receipt-action-btn" href="{{ url_for('download_receipt_pdf', public_key=user.public_key) }}">
+        <span class="receipt-action-icon">⤓</span>
+        <span>Download PDF</span>
       </a>
     </div>
 

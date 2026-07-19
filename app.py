@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import io
 import os
 import re
 import secrets
@@ -19,10 +20,16 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_file,
     send_from_directory,
     url_for,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from PIL import Image, ImageDraw, ImageFont
+from reportlab.lib.colors import HexColor
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "site.db"
@@ -349,6 +356,129 @@ def create_public_key(display_name: str, contact: str, receipt_time: str) -> str
     return f"MUR-{digest[:10]}"
 
 
+
+def receipt_payload(user):
+    return {
+        "display_name": user["display_name"],
+        "contact": user["contact"],
+        "contact_masked": user["contact_masked"],
+        "amount": float(user["amount"] or 0.0),
+        "transaction_cost": float(user["transaction_cost"] or 0.0),
+        "receipt_time": user["receipt_time"],
+        "code": user["code"],
+        "receipt_note": user["receipt_note"] or "",
+    }
+
+
+def _load_font(size: int, bold: bool = False):
+    candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
+    ]
+    for candidate in candidates:
+        try:
+            if os.path.exists(candidate):
+                return ImageFont.truetype(candidate, size=size)
+        except Exception:
+            pass
+    return ImageFont.load_default()
+
+
+def render_receipt_png(user):
+    data = receipt_payload(user)
+    img = Image.new("RGB", (1400, 1800), "#101216")
+    draw = ImageDraw.Draw(img)
+    card = (80, 90, 1320, 1710)
+    draw.rounded_rectangle(card, radius=48, fill="#191c22")
+    for x in range(card[0], card[2]):
+        t = (x - card[0]) / (card[2] - card[0])
+        r = int(41 + (45 - 41) * t)
+        g = int(151 + (216 - 151) * t)
+        b = int(255 - (255 - 111) * t)
+        draw.line((x, 92, x, 95), fill=(r, g, b))
+    draw.ellipse((610, 150, 790, 330), fill="#12151b", outline="#2a2f39", width=4)
+    draw.text((700, 225), "🎉", font=_load_font(86), fill="#ffffff", anchor="mm")
+    f_title = _load_font(56, True)
+    f_small = _load_font(30, False)
+    f_big = _load_font(86, True)
+    f_mid = _load_font(34, False)
+    f_mid_b = _load_font(34, True)
+
+    draw.multiline_text((700, 395), "Your transaction\\nwas successful", font=f_title, fill="#ffffff", anchor="ma", align="center", spacing=6)
+    draw.text((700, 560), data["receipt_time"], font=f_small, fill="#b8bfca", anchor="ma")
+    draw.text((700, 670), f"Ksh {data['amount']:.2f}", font=f_big, fill="#ffffff", anchor="ma")
+    draw.text((700, 790), f"Transaction cost: Ksh {data['transaction_cost']:.2f}", font=f_mid, fill="#b8bfca", anchor="ma")
+    draw.text((520, 880), "ID:", font=f_mid_b, fill="#30e06f")
+    draw.text((585, 880), data["code"], font=f_mid_b, fill="#30e06f")
+    draw.text((1060, 880), "⧉ Copy", font=f_mid_b, fill="#30e06f")
+
+    draw.rounded_rectangle((170, 980, 1230, 1225), radius=28, fill="#232831")
+    draw.text((210, 1020), "Send to:", font=f_small, fill="#c2c8d2")
+    draw.ellipse((225, 1075, 340, 1190), fill="#8b4f22")
+    initials = (data["display_name"][:2] or "??").upper()
+    draw.text((283, 1132), initials, font=_load_font(40, True), fill="#ffb26f", anchor="mm")
+    draw.text((380, 1088), data["display_name"], font=f_mid_b, fill="#ffffff")
+    draw.text((380, 1140), data["contact_masked"], font=f_mid, fill="#c7ced8")
+
+    if data["receipt_note"]:
+        draw.rounded_rectangle((170, 1260, 1230, 1370), radius=24, fill="#232831")
+        draw.text((210, 1300), data["receipt_note"], font=f_mid, fill="#d9dee7")
+
+    draw.rounded_rectangle((170, 1420, 520, 1560), radius=26, fill="#20242d")
+    draw.rounded_rectangle((560, 1420, 910, 1560), radius=26, fill="#20242d")
+    draw.rounded_rectangle((370, 1600, 1030, 1676), radius=24, fill="#2dd86f")
+    draw.text((345, 1490), "★", font=_load_font(44, True), fill="#30e06f")
+    draw.multiline_text((345, 1528), "Add to\\nfavourites", font=f_small, fill="#ffffff", anchor="ma", align="center")
+    draw.text((735, 1490), "⇩", font=_load_font(44, True), fill="#30e06f")
+    draw.multiline_text((735, 1528), "Download\\nreceipt", font=f_small, fill="#ffffff", anchor="ma", align="center")
+    draw.text((700, 1638), "Done", font=_load_font(36, True), fill="#ffffff", anchor="ma")
+    return img
+
+
+def render_receipt_pdf(user):
+    data = receipt_payload(user)
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    w, h = A4
+    c.setFillColor(HexColor("#101216"))
+    c.rect(0, 0, w, h, fill=1, stroke=0)
+    c.setFillColor(HexColor("#191c22"))
+    c.roundRect(36, 36, w - 72, h - 72, 26, fill=1, stroke=0)
+    c.setStrokeColor(HexColor("#2dd86f"))
+    c.line(36, h - 40, w - 36, h - 40)
+    c.setFillColor(HexColor("#ffffff"))
+    c.setFont("Helvetica-Bold", 26)
+    c.drawCentredString(w / 2, h - 120, "Your transaction")
+    c.drawCentredString(w / 2, h - 150, "was successful")
+    c.setFillColor(HexColor("#b8bfca"))
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(w / 2, h - 188, data["receipt_time"])
+    c.setFillColor(HexColor("#ffffff"))
+    c.setFont("Helvetica-Bold", 34)
+    c.drawCentredString(w / 2, h - 240, f"Ksh {data['amount']:.2f}")
+    c.setFont("Helvetica", 12)
+    c.setFillColor(HexColor("#b8bfca"))
+    c.drawCentredString(w / 2, h - 266, f"Transaction cost: Ksh {data['transaction_cost']:.2f}")
+    c.setFillColor(HexColor("#30e06f"))
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(80, h - 300, f"ID: {data['code']}")
+    c.drawRightString(w - 80, h - 300, "Copy")
+    c.setFillColor(HexColor("#c7ced8"))
+    c.setFont("Helvetica", 12)
+    c.drawString(80, h - 360, f"Send to: {data['display_name']}")
+    c.drawString(80, h - 382, f"Contact: {data['contact_masked']}")
+    if data["receipt_note"]:
+        text_obj = c.beginText(80, h - 430)
+        text_obj.setFont("Helvetica", 11)
+        text_obj.setFillColor(HexColor("#d9dee7"))
+        text_obj.textLines(data["receipt_note"])
+        c.drawText(text_obj)
+    c.showPage()
+    c.save()
+    buf.seek(0)
+    return buf
+
+
 def current_user_key():
     return request.args.get("key") or request.form.get("key") or request.cookies.get("user_key")
 
@@ -447,7 +577,7 @@ def index():
 def register():
     display_name = (request.form.get("display_name") or "").strip()
     contact = (request.form.get("contact") or "").strip()
-    amount = safe_float(request.form.get("amount"), 100.0)
+    amount = 0.0
     receipt_time = parse_datetime_input(request.form.get("receipt_time") or "")
     receipt_note = (request.form.get("receipt_note") or "").strip()
     referrer_public_key = (request.form.get("referrer_public_key") or request.args.get("ref") or "").strip()
@@ -462,7 +592,7 @@ def register():
     contact_masked = mask_contact(contact)
     public_key = create_public_key(display_name, contact, receipt_time)
     code = build_code(display_name, contact, receipt_time)
-    balance = max(0.0, round(10000.0 - amount, 2))
+    balance = 0.0
 
     conn = db()
     conn.execute(
@@ -592,7 +722,7 @@ def save_receipt(public_key):
     contact = (request.form.get("contact") or user["contact"]).strip()
     contact_masked = mask_contact(contact)
     code = build_code(user["display_name"], contact, receipt_time)
-    balance = max(0.0, round(10000.0 - amount, 2))
+    balance = 0.0
 
     db().execute(
         """
@@ -611,10 +741,15 @@ def save_receipt(public_key):
 @app.route("/u/<public_key>/download")
 @require_registered_user
 def download_receipt(public_key):
+    return redirect(url_for("download_receipt_png", public_key=public_key))
+
+
+@app.route("/u/<public_key>/download/png")
+@require_registered_user
+def download_receipt_png(public_key):
     user = fetch_user(public_key)
     if not user:
         abort(404)
-
     db().execute(
         """
         INSERT INTO download_logs
@@ -632,7 +767,38 @@ def download_receipt(public_key):
         ),
     )
     db().commit()
-    return redirect(url_for("receipt_app", key=public_key))
+    img = render_receipt_png(user)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return send_file(buf, mimetype="image/png", as_attachment=True, download_name=f"receipt-{public_key}.png")
+
+
+@app.route("/u/<public_key>/download/pdf")
+@require_registered_user
+def download_receipt_pdf(public_key):
+    user = fetch_user(public_key)
+    if not user:
+        abort(404)
+    db().execute(
+        """
+        INSERT INTO download_logs
+        (user_public_key, display_name, amount, referrer_public_key, ip_address, user_agent, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            user["public_key"],
+            user["display_name"],
+            user["amount"],
+            user["referrer_public_key"],
+            request.headers.get("X-Forwarded-For", request.remote_addr or ""),
+            request.headers.get("User-Agent", ""),
+            now_iso(),
+        ),
+    )
+    db().commit()
+    buf = render_receipt_pdf(user)
+    return send_file(buf, mimetype="application/pdf", as_attachment=True, download_name=f"receipt-{public_key}.pdf")
 
 
 @app.route("/receipt-app")
@@ -812,7 +978,7 @@ def save_user(public_key):
     receipt_note = (request.form.get("receipt_note") or "").strip()
     contact_masked = mask_contact(contact)
     code = build_code(display_name, contact, receipt_time)
-    balance = max(0.0, round(10000.0 - amount, 2))
+    balance = 0.0
 
     db().execute(
         """
