@@ -44,17 +44,23 @@
     {% endif %}
 
     <div class="receipt-actions-grid">
-      <button class="receipt-action-btn" data-fav="{{ user.public_key }}">
-        <span class="receipt-action-icon">☆</span>
-        <span>Add to favourites</span>
+      <button class="receipt-action-btn receipt-action-fav" type="button" data-fav="{{ user.public_key }}" aria-label="Add to favourites">
+        <span class="receipt-action-graphic" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" focusable="false">
+            <path d="M32 11.5l5.4 11 12.2 1.8-8.8 8.5 2.1 12.1L32 39.2l-10.9 5.7 2.1-12.1-8.8-8.5 12.2-1.8L32 11.5z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="receipt-action-label"><span>Add to</span><span>favourites</span></span>
       </button>
-      <a class="receipt-action-btn" href="{{ url_for('download_receipt_png', public_key=user.public_key) }}">
-        <span class="receipt-action-icon">⤓</span>
-        <span>Download PNG</span>
-      </a>
-      <a class="receipt-action-btn" href="{{ url_for('download_receipt_pdf', public_key=user.public_key) }}">
-        <span class="receipt-action-icon">⤓</span>
-        <span>Download PDF</span>
+      <a class="receipt-action-btn receipt-action-download" href="{{ url_for('download_receipt', public_key=user.public_key) }}" aria-label="Download receipt">
+        <span class="receipt-action-graphic" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img" focusable="false">
+            <path d="M20 10h18l10 10v34H20z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
+            <path d="M38 10v12h12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/>
+            <rect x="18" y="29" width="28" height="6" rx="3" fill="#e74b5a" />
+          </svg>
+        </span>
+        <span class="receipt-action-label"><span>Download</span><span>receipt</span></span>
       </a>
     </div>
 
