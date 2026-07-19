@@ -281,3 +281,55 @@ html,body{background:linear-gradient(180deg,#0f1115 0%, #151922 100%);color:#eef
   .receipt-action-download .receipt-action-graphic svg,.receipt-action-share .receipt-action-graphic svg{width:19px;height:19px}
   .receipt-action-label{font-size:.62rem}
 }
+
+/* Receipt preview + editor refresh */
+.receipt-screen{width:min(100%,460px);margin:0 auto;padding:14px 16px 28px;display:grid;gap:14px}
+.receipt-screen .receipt-top-actions{display:flex;justify-content:space-between;align-items:center;padding:0 2px}
+.circle-action{width:36px;height:36px;border-radius:50%;background:#1a1a1a;border:0;display:grid;place-items:center;box-shadow:none;padding:0;cursor:pointer}
+.circle-action svg{width:20px;height:20px;display:block}
+.receipt-editor-panel{background:#0b0b0d;border:1px solid rgba(255,255,255,.06);border-radius:24px;padding:16px}
+.receipt-editor-panel .editor-title{color:#fff;font-size:1.02rem;font-weight:800;margin-bottom:12px}
+.receipt-editor-panel .editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:0}
+.receipt-editor-panel .editor-grid label.full{grid-column:1 / -1}
+.receipt-editor-panel .editor-actions{display:flex;gap:10px;align-items:center;margin-top:14px}
+.receipt-editor-panel .editor-actions .done-btn{flex:1;margin-top:0}
+.receipt-close-link{min-height:52px}
+.receipt-card.dark-receipt{background:#000;border:0;border-radius:28px;box-shadow:none;padding:0 0 18px;overflow:visible}
+.receipt-card.dark-receipt .receipt-topline{height:4px;background:linear-gradient(90deg,#007aff,#34c759);border-radius:4px 4px 0 0}
+.receipt-top-icon{width:72px;height:72px;border-radius:50%;margin:-36px auto 14px;display:grid;place-items:center;background:#101010;border:3px solid #2c2c2e;font-size:2.3rem;line-height:1}
+.receipt-card.dark-receipt h1{margin:0;text-align:center;color:#fff;font-size:22px;line-height:28px;font-weight:600;letter-spacing:-.01em}
+.receipt-card.dark-receipt .subhead{text-align:center;margin-top:8px;color:#8e8e93;font-size:14px;font-weight:400}
+.receipt-amount{font-size:36px;line-height:1.05;font-weight:700;margin:20px 0 12px;color:#fff;text-align:center}
+.receipt-cost{text-align:center;font-size:14px;line-height:20px;color:#8e8e93}
+.receipt-cost strong{color:#fff;font-weight:600}
+.receipt-code{display:flex;justify-content:center;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0 0;color:#34c759;font-size:14px;font-weight:600}
+.receipt-code span{color:#34c759;font-weight:600}
+.text-copy{background:none;border:0;color:#34c759;font-weight:600;padding:0;cursor:pointer}
+.recipient-card.dark-recipient{max-width:100%;margin:16px 0 0;padding:16px;border-radius:12px;background:#1f1f1f;border:1px solid rgba(255,255,255,.04)}
+.recipient-label{color:#8e8e93;font-size:13px;line-height:18px;margin-bottom:12px}
+.recipient-row{display:flex;align-items:center;gap:12px}
+.avatar.dark-avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#d97706;color:#fb923c;font-size:18px;font-weight:700}
+.recipient-name{color:#fff;font-size:16px;line-height:22px;font-weight:600}
+.recipient-phone{color:#8e8e93;font-size:14px;line-height:20px}
+.note-box.dark-note{margin-top:12px;border-radius:12px;background:#1f1f1f;color:#dfe5ee;border:1px solid rgba(255,255,255,.04)}
+.receipt-actions-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0 0;width:100%}
+.receipt-actions-grid.is-preview{grid-template-columns:repeat(2,minmax(0,1fr))}
+.receipt-action-btn{min-height:80px;border-radius:16px;border:0;background:#1a1a1a;display:grid;place-items:center;gap:6px;padding:10px 4px;text-align:center;min-width:0;box-shadow:none}
+.receipt-action-btn:hover{transform:none;background:#1d1d1d}
+.receipt-action-graphic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#1a1a1a;color:#34c759;box-shadow:none}
+.receipt-action-graphic svg{width:22px;height:22px;display:block}
+.receipt-action-download .receipt-action-graphic svg{width:22px;height:22px}
+.receipt-action-share .receipt-action-graphic svg{width:22px;height:22px}
+.receipt-action-label{display:grid;gap:0;line-height:16px;font-weight:500;font-size:12px;color:#fff}
+.receipt-action-label span{display:block}
+.receipt-done{width:100%;max-width:none;height:52px;border-radius:12px;margin-top:16px;font-size:18px;font-weight:600;background:#34c759;color:#fff;box-shadow:none}
+.open-editor-btn{display:grid;place-items:center}
+
+@media (max-width: 520px){
+  .receipt-screen{padding-left:12px;padding-right:12px}
+  .receipt-editor-panel .editor-grid{grid-template-columns:1fr}
+  .receipt-actions-grid{gap:8px}
+  .receipt-action-btn{min-height:76px;padding:8px 2px}
+  .receipt-action-graphic{width:36px;height:36px}
+  .receipt-action-label{font-size:11px}
+}

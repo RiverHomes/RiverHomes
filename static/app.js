@@ -36,6 +36,30 @@
   });
 
 
+
+  const shareButtons = document.querySelectorAll('[data-share-url]');
+  shareButtons.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const url = btn.getAttribute('data-share-url') || window.location.href;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: document.title, url });
+          return;
+        }
+      } catch (e) {
+        // fall through to copy
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        const prev = btn.innerHTML;
+        btn.innerHTML = '<span aria-hidden="true">Copied</span>';
+        setTimeout(() => (btn.innerHTML = prev), 1000);
+      } catch (e) {
+        alert('Share failed');
+      }
+    });
+  });
+
   const extraActionButtons = document.querySelectorAll('.receipt-action-reverse, .receipt-action-share');
   extraActionButtons.forEach(btn => {
     btn.addEventListener('click', () => {
