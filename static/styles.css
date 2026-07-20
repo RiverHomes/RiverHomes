@@ -186,15 +186,17 @@ html,body{background:linear-gradient(180deg,#0f1115 0%, #151922 100%);color:#eef
 .primary,.done-btn{background:linear-gradient(135deg,var(--green),var(--green-2));color:#09110b;box-shadow:0 16px 30px rgba(45,216,111,.18)}
 .chip,.ghost-btn,.icon-btn,.circle-action,.receipt-action-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#eef2f7}
 .receipt-shell{width:min(100%,430px);margin:0 auto;display:grid;gap:12px;padding:0 16px 24px}
-.receipt-top-actions{display:flex;justify-content:space-between;align-items:center;padding:0 4px 2px;margin-bottom:2px}
+.receipt-top-actions{display:flex;justify-content:space-between;align-items:center;padding:0 4px 0;margin:0 0 -4px}
 .circle-action{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:#1a1a1a;border:1px solid rgba(255,255,255,.06)}
 .receipt-top-actions .circle-action{background:#1a1a1a;border:1px solid rgba(255,255,255,.06)}
 .receipt-top-actions .circle-action svg{width:18px;height:18px;display:block}
 .receipt-top-actions .receipt-close-btn svg{transform:translateX(-.5px)}
 
 .receipt-editor{background:rgba(20,23,29,.92);border:1px solid rgba(255,255,255,.06);border-radius:28px;padding:18px}
-.editor-title{font-weight:800;margin-bottom:10px}
-.receipt-card.dark-receipt{background:#191c22;border:1px solid rgba(255,255,255,.05);color:var(--receipt-text);border-radius:34px;box-shadow:0 30px 80px rgba(0,0,0,.36);padding:18px 18px 16px;width:100%}
+.editor-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.editor-title{font-weight:800}
+.editor-cancel{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#eef2f7;font-weight:700;font-size:.9rem}
+.receipt-card.dark-receipt{background:#191c22;border:1px solid rgba(255,255,255,.05);color:var(--receipt-text);border-radius:34px;box-shadow:0 30px 80px rgba(0,0,0,.36);padding:14px 18px 16px;width:100%}
 .receipt-card.dark-receipt .receipt-topline{background:linear-gradient(90deg,var(--blue),var(--green));height:3px}
 .receipt-top-icon{width:72px;height:72px;border-radius:50%;margin:-24px auto 14px;display:grid;place-items:center;background:#11131a;border:3px solid #2c2c2e;font-size:2rem;transform:translateY(18px)}
 .receipt-card.dark-receipt h1{margin:16px 0 0;text-align:center;color:#fff;font-size:22px;line-height:28px;font-weight:600}
@@ -213,18 +215,18 @@ html,body{background:linear-gradient(180deg,#0f1115 0%, #151922 100%);color:#eef
 .recipient-phone{color:#8e8e93;font-size:14px}
 .note-box.dark-note{max-width:100%;margin:16px auto 0;border-radius:12px}
 .receipt-actions-grid{display:flex;flex-wrap:nowrap;justify-content:space-between;gap:6px;margin:18px auto 0;max-width:100%;width:100%}
-.receipt-action-btn{flex:1 1 0;min-width:0;min-height:84px;border-radius:22px;display:grid;place-items:center;gap:4px;padding:8px 2px 8px;border:1px solid rgba(255,255,255,.08);text-align:center;background:#20242c;color:#fff;cursor:pointer;transition:transform .15s ease, border-color .15s ease, background .15s ease}
+.receipt-actions-grid-two{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:12px;align-items:start}
+.receipt-action-btn{min-width:0;min-height:84px;border-radius:22px;display:grid;place-items:center;gap:4px;padding:8px 2px 8px;border:1px solid rgba(255,255,255,.08);text-align:center;background:#20242c;color:#fff;cursor:pointer;transition:transform .15s ease, border-color .15s ease, background .15s ease}
 .receipt-action-btn:hover{transform:translateY(-1px);border-color:rgba(45,216,111,.24);background:#232833}
 .receipt-action-graphic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#2a2e36;color:#30e06f;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
 .receipt-action-graphic svg{width:20px;height:20px;display:block}
 .receipt-action-download .receipt-action-graphic{color:#30e06f}
 .receipt-action-download .receipt-action-graphic svg{width:21px;height:21px}
 .receipt-action-fav .receipt-action-graphic{color:#30e06f}
-.receipt-action-reverse .receipt-action-graphic{color:#30e06f}
-.receipt-action-share .receipt-action-graphic{color:#30e06f}
-.receipt-action-share .receipt-action-graphic svg{width:21px;height:21px}
+.receipt-action-download .receipt-action-graphic{color:#30e06f}
 .receipt-action-label{display:grid;gap:0;line-height:1.05;font-weight:500;font-size:12px;color:#ffffff}
 .receipt-action-label span{display:block}
+.receipt-action-spacer{visibility:hidden;pointer-events:none}
 .receipt-done{max-width:100%;margin-top:16px;font-size:1rem}
 .messages-shell.clean-messages{grid-template-columns:.92fr 1.08fr}
 .contacts-panel,.thread-panel{background:linear-gradient(180deg, rgba(24,28,36,.96), rgba(18,21,28,.96));border:1px solid rgba(255,255,255,.06);color:#eef2f7}
