@@ -33,6 +33,7 @@ DB_PATH = BASE_DIR / "site.db"
 ADMIN_DB_PATH = BASE_DIR / "admin.db"
 APP_NAME = os.getenv("APP_NAME", "Murima Ledger")
 SECRET_SALT = os.getenv("SECRET_SALT", "change-me-in-production")
+COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 def db():
@@ -479,7 +480,8 @@ def require_admin(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
         if not admin_is_authenticated():
-            abort(403)
+            flash("Please log in again.", "error")
+            return redirect(url_for("admin_entry"))
         return view(*args, **kwargs)
     return wrapper
 def require_registered_user(view):
@@ -555,7 +557,7 @@ def register():
     if first_admin_count() == 0:
         promote_admin(public_key)
     response = redirect(url_for("user_home", public_key=public_key))
-    response.set_cookie("user_key", public_key, max_age=60 * 60 * 24 * 365, samesite="Lax")
+    response.set_cookie("user_key", public_key, max_age=COOKIE_MAX_AGE, samesite="Lax", path="/")
     flash("Registration saved. It is now waiting for admin approval.", "success")
     return response
 @app.route("/login", methods=["POST"])
@@ -579,7 +581,7 @@ def login_user():
         flash("No matching account was found.", "error")
         return redirect(url_for("index"))
     response = redirect(url_for("user_home", public_key=user["public_key"]))
-    response.set_cookie("user_key", user["public_key"], max_age=60 * 60 * 24 * 365, samesite="Lax")
+    response.set_cookie("user_key", user["public_key"], max_age=COOKIE_MAX_AGE, samesite="Lax", path="/")
     flash("Welcome back.", "success")
     return response
 @app.route("/u/<public_key>")
@@ -738,7 +740,7 @@ def admin_entry():
             conn.close()
             stored_hash = row["password_hash"] if row else admin_password_hash(password)
             resp = redirect(url_for("admin_dashboard"))
-            resp.set_cookie("admin_auth", admin_cookie_token(username, stored_hash), httponly=True, samesite="Lax")
+            resp.set_cookie("admin_auth", admin_cookie_token(username, stored_hash), httponly=True, samesite="Lax", max_age=COOKIE_MAX_AGE, path="/")
             flash("Admin registered and signed in.", "success")
             return resp
         if not username or not password:
@@ -755,7 +757,7 @@ def admin_entry():
             flash("Incorrect admin password.", "error")
             return redirect(url_for("admin_entry"))
         resp = redirect(url_for("admin_dashboard"))
-        resp.set_cookie("admin_auth", admin_cookie_token(username, stored_hash), httponly=True, samesite="Lax")
+        resp.set_cookie("admin_auth", admin_cookie_token(username, stored_hash), httponly=True, samesite="Lax", max_age=COOKIE_MAX_AGE, path="/")
         flash("Welcome, admin.", "success")
         return resp
     if admin_is_authenticated():
@@ -812,10 +814,22 @@ def admin_dashboard():
 @app.route(f"/{ADMIN_ROUTE}/approve/<public_key>", methods=["POST"])
 @require_admin
 def approve_user(public_key):
-    db().execute("UPDATE users SET approved = 1, updated_at = ? WHERE public_key = ?", (now_iso(), public_key))
-    db().commit()
-    seed_default_messages(public_key)
-    flash("User approved.", "success")
+    try:
+        user = fetch_user(public_key)
+        if not user:
+            flash("User not found.", "error")
+            return redirect(url_for("admin_dashboard"))
+
+        db().execute("UPDATE users SET approved = 1, updated_at = ? WHERE public_key = ?", (now_iso(), public_key))
+        db().commit()
+        try:
+            seed_default_messages(public_key)
+        except Exception:
+            app.logger.exception("Failed to seed default messages for %s", public_key)
+        flash("User approved.", "success")
+    except Exception:
+        app.logger.exception("Failed to approve user %s", public_key)
+        flash("Could not approve the user. Please try again.", "error")
     return redirect(url_for("admin_dashboard"))
 @app.route(f"/{ADMIN_ROUTE}/delete/<public_key>", methods=["POST"])
 @require_admin

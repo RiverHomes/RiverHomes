@@ -52,11 +52,11 @@
       <form class="login-form" action="{{ url_for('login_user') }}" method="post">
         <label class="full">
           <span>Name</span>
-          <input name="display_name" placeholder="Murima 01" required>
+          <input name="display_name" autocomplete="username" placeholder="Murima 01" required>
         </label>
         <label class="full">
           <span>Contact</span>
-          <input name="contact" placeholder="0712345678" required>
+          <input name="contact" autocomplete="tel" placeholder="0712345678" required>
         </label>
         <button class="primary full" type="submit">Log in</button>
       </form>
@@ -71,11 +71,11 @@
         {% endif %}
         <label class="full">
           <span>Name</span>
-          <input name="display_name" placeholder="Mom / Dad / User 1" required>
+          <input name="display_name" autocomplete="username" placeholder="Mom / Dad / User 1" required>
         </label>
         <label class="full">
           <span>Contact</span>
-          <input name="contact" placeholder="0712345678" required>
+          <input name="contact" autocomplete="tel" placeholder="0712345678" required>
         </label>
         <button class="primary full" type="submit">Register and continue</button>
       </form>

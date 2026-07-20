@@ -1,10 +1,13 @@
-const CACHE_NAME = 'murima-ledger-v1';
+const CACHE_NAME = 'murima-ledger-v2';
 const SHELL_ASSETS = [
   '/',
   '/offline',
   '/static/styles.css',
   '/static/app.js',
-  '/static/manifest.json'
+  '/static/manifest.json',
+  '/static/favicon.png',
+  '/static/icon-192.png',
+  '/static/icon-512.png'
 ];
 
 self.addEventListener('install', event => {

@@ -15,11 +15,11 @@
     <input type="hidden" name="action" value="{{ 'register' if mode == 'register' else 'login' }}">
     <label class="full">
       <span>Admin username</span>
-      <input name="username" placeholder="your-name" value="{{ first_admin_username if mode == 'register' else '' }}">
+      <input name="username" autocomplete="username" placeholder="your-name" value="{{ first_admin_username if mode == 'register' else '' }}">
     </label>
     <label class="full">
       <span>Admin password</span>
-      <input name="password" type="password" placeholder="••••••••">
+      <input name="password" type="password" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" placeholder="••••••••">
     </label>
     <button class="primary full" type="submit">
       {{ 'Create admin and enter dashboard' if mode == 'register' else 'Log in to dashboard' }}

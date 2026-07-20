@@ -58,6 +58,66 @@
     });
   }
 
+
+  function persistFormState(form) {
+    if (!form) return;
+    const fields = Array.from(form.querySelectorAll('input[name], textarea[name], select[name]'));
+    if (!fields.length) return;
+
+    const storageKey = `form:${window.location.pathname}:${form.getAttribute('action') || 'self'}:${form.getAttribute('id') || form.getAttribute('class') || 'form'}`;
+
+    const loadState = () => {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        fields.forEach(field => {
+          const name = field.name;
+          if (!(name in state)) return;
+          const value = state[name];
+          if (field.type === 'checkbox') {
+            field.checked = !!value;
+          } else if (field.type === 'radio') {
+            field.checked = value === field.value;
+          } else {
+            field.value = value;
+          }
+        });
+      } catch (e) {}
+    };
+
+    const saveState = () => {
+      try {
+        const state = {};
+        fields.forEach(field => {
+          if (!field.name) return;
+          if (field.type === 'checkbox') {
+            state[field.name] = field.checked;
+          } else if (field.type === 'radio') {
+            if (field.checked) state[field.name] = field.value;
+          } else {
+            state[field.name] = field.value;
+          }
+        });
+        localStorage.setItem(storageKey, JSON.stringify(state));
+      } catch (e) {}
+    };
+
+    loadState();
+    fields.forEach(field => {
+      field.addEventListener('input', saveState);
+      field.addEventListener('change', saveState);
+    });
+
+    form.addEventListener('reset', () => {
+      try {
+        localStorage.removeItem(storageKey);
+      } catch (e) {}
+    });
+  }
+
+  document.querySelectorAll('form').forEach(persistFormState);
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/service-worker.js').catch(() => {});
