@@ -21,8 +21,10 @@ python app.py
 
 Set optional env vars:
 - `ADMIN_ROUTE` (optional; otherwise the route is stored in the admin database)
+- `ADMIN_USERNAME` (defaults to `admin`)
+- `ADMIN_PASSWORD` (if set, this becomes the admin password and is synced into the admin database)
 - `SECRET_KEY`
 - `SECRET_SALT`
 - `APP_NAME`
 
-Admin accounts now use a username + password hash stored in the database, and the admin route is loaded from the admin database or the `ADMIN_ROUTE` environment variable.
+If `ADMIN_PASSWORD` is set on Render, the app will create or update that admin account automatically at startup, and the login form will use those credentials instead of a one-time registration flow.

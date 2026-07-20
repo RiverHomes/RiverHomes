@@ -33,7 +33,8 @@ DB_PATH = BASE_DIR / "site.db"
 ADMIN_DB_PATH = BASE_DIR / "admin.db"
 APP_NAME = os.getenv("APP_NAME", "Murima Ledger")
 SECRET_SALT = os.getenv("SECRET_SALT", "change-me-in-production")
-COOKIE_MAX_AGE = 60 * 60 * 24 * 365
+ADMIN_USERNAME = (os.getenv("ADMIN_USERNAME") or "admin").strip() or "admin"
+ADMIN_PASSWORD = (os.getenv("ADMIN_PASSWORD") or "").strip()
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 def db():
@@ -104,6 +105,7 @@ def init_admin_db():
     )
     conn.commit()
     conn.close()
+    sync_env_admin_account()
 def admin_password_hash(password: str) -> str:
     return generate_password_hash(password, method="pbkdf2:sha256", salt_length=16)
 def admin_cookie_token(username: str, password_hash_value: str) -> str:
@@ -151,6 +153,29 @@ def promote_admin(username: str, password: str = "") -> bool:
     finally:
         conn.close()
     return True
+
+
+def sync_env_admin_account() -> tuple[str, str] | None:
+    if not ADMIN_PASSWORD:
+        return None
+    password_hash_value = admin_password_hash(ADMIN_PASSWORD)
+    conn = admin_db()
+    try:
+        existing = conn.execute("SELECT id FROM admins WHERE username = ?", (ADMIN_USERNAME,)).fetchone()
+        if existing:
+            conn.execute(
+                "UPDATE admins SET password_hash = ? WHERE username = ?",
+                (password_hash_value, ADMIN_USERNAME),
+            )
+        else:
+            conn.execute(
+                "INSERT INTO admins (username, password_hash, created_at) VALUES (?, ?, ?)",
+                (ADMIN_USERNAME, password_hash_value, now_iso()),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+    return ADMIN_USERNAME, password_hash_value
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -480,8 +505,7 @@ def require_admin(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
         if not admin_is_authenticated():
-            flash("Please log in again.", "error")
-            return redirect(url_for("admin_entry"))
+            abort(403)
         return view(*args, **kwargs)
     return wrapper
 def require_registered_user(view):
@@ -557,7 +581,7 @@ def register():
     if first_admin_count() == 0:
         promote_admin(public_key)
     response = redirect(url_for("user_home", public_key=public_key))
-    response.set_cookie("user_key", public_key, max_age=COOKIE_MAX_AGE, samesite="Lax", path="/")
+    response.set_cookie("user_key", public_key, max_age=60 * 60 * 24 * 365, samesite="Lax")
     flash("Registration saved. It is now waiting for admin approval.", "success")
     return response
 @app.route("/login", methods=["POST"])
@@ -581,7 +605,7 @@ def login_user():
         flash("No matching account was found.", "error")
         return redirect(url_for("index"))
     response = redirect(url_for("user_home", public_key=user["public_key"]))
-    response.set_cookie("user_key", user["public_key"], max_age=COOKIE_MAX_AGE, samesite="Lax", path="/")
+    response.set_cookie("user_key", user["public_key"], max_age=60 * 60 * 24 * 365, samesite="Lax")
     flash("Welcome back.", "success")
     return response
 @app.route("/u/<public_key>")
@@ -727,6 +751,12 @@ def admin_entry():
         action = (request.form.get("action") or "").strip().lower() or "login"
         username = (request.form.get("username") or "").strip()
         password = (request.form.get("password") or "").strip()
+        if ADMIN_PASSWORD and username == ADMIN_USERNAME and password == ADMIN_PASSWORD and action == "login":
+            _, stored_hash = sync_env_admin_account() or (ADMIN_USERNAME, admin_password_hash(ADMIN_PASSWORD))
+            resp = redirect(url_for("admin_dashboard"))
+            resp.set_cookie("admin_auth", admin_cookie_token(ADMIN_USERNAME, stored_hash), httponly=True, samesite="Lax", max_age=31536000, path="/")
+            flash("Welcome, admin.", "success")
+            return resp
         if action == "register":
             if not username:
                 flash("Choose an admin username.", "error")
@@ -740,7 +770,7 @@ def admin_entry():
             conn.close()
             stored_hash = row["password_hash"] if row else admin_password_hash(password)
             resp = redirect(url_for("admin_dashboard"))
-            resp.set_cookie("admin_auth", admin_cookie_token(username, stored_hash), httponly=True, samesite="Lax", max_age=COOKIE_MAX_AGE, path="/")
+            resp.set_cookie("admin_auth", admin_cookie_token(username, stored_hash), httponly=True, samesite="Lax", max_age=31536000, path="/")
             flash("Admin registered and signed in.", "success")
             return resp
         if not username or not password:
@@ -757,13 +787,13 @@ def admin_entry():
             flash("Incorrect admin password.", "error")
             return redirect(url_for("admin_entry"))
         resp = redirect(url_for("admin_dashboard"))
-        resp.set_cookie("admin_auth", admin_cookie_token(username, stored_hash), httponly=True, samesite="Lax", max_age=COOKIE_MAX_AGE, path="/")
+        resp.set_cookie("admin_auth", admin_cookie_token(username, stored_hash), httponly=True, samesite="Lax", max_age=31536000, path="/")
         flash("Welcome, admin.", "success")
         return resp
     if admin_is_authenticated():
         return redirect(url_for("admin_dashboard"))
     rows = admin_rows()
-    mode = "register" if not rows else "login"
+    mode = "register" if not rows and not ADMIN_PASSWORD else "login"
     return render_template(
         "admin_login.html",
         error=None,
@@ -814,22 +844,10 @@ def admin_dashboard():
 @app.route(f"/{ADMIN_ROUTE}/approve/<public_key>", methods=["POST"])
 @require_admin
 def approve_user(public_key):
-    try:
-        user = fetch_user(public_key)
-        if not user:
-            flash("User not found.", "error")
-            return redirect(url_for("admin_dashboard"))
-
-        db().execute("UPDATE users SET approved = 1, updated_at = ? WHERE public_key = ?", (now_iso(), public_key))
-        db().commit()
-        try:
-            seed_default_messages(public_key)
-        except Exception:
-            app.logger.exception("Failed to seed default messages for %s", public_key)
-        flash("User approved.", "success")
-    except Exception:
-        app.logger.exception("Failed to approve user %s", public_key)
-        flash("Could not approve the user. Please try again.", "error")
+    db().execute("UPDATE users SET approved = 1, updated_at = ? WHERE public_key = ?", (now_iso(), public_key))
+    db().commit()
+    seed_default_messages(public_key)
+    flash("User approved.", "success")
     return redirect(url_for("admin_dashboard"))
 @app.route(f"/{ADMIN_ROUTE}/delete/<public_key>", methods=["POST"])
 @require_admin

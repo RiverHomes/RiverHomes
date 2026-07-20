@@ -67,23 +67,23 @@
       {% endif %}
       <label>
         <span>Name</span>
-        <input name="display_name" autocomplete="username" placeholder="Murima 01 / Dad 2 / Aunty3" required>
+        <input name="display_name" placeholder="Murima 01 / Dad 2 / Aunty3" required>
       </label>
       <label>
         <span>Contact</span>
-        <input name="contact" autocomplete="tel" placeholder="0712345678" required>
+        <input name="contact" placeholder="0712345678" required>
       </label>
       <label>
         <span>Amount</span>
-        <input name="amount" autocomplete="off" type="number" step="0.01" value="100">
+        <input name="amount" type="number" step="0.01" value="100">
       </label>
       <label>
         <span>Date & time</span>
-        <input name="receipt_time" autocomplete="off" type="datetime-local">
+        <input name="receipt_time" type="datetime-local">
       </label>
       <label class="full">
         <span>Optional note</span>
-        <input name="receipt_note" autocomplete="off" placeholder="Add a custom note">
+        <input name="receipt_note" placeholder="Add a custom note">
       </label>
       <button class="primary full" type="submit">Create pending record</button>
     </form>
@@ -99,11 +99,11 @@
     <form class="login-form" action="{{ url_for('login_user') }}" method="post">
       <label class="full">
         <span>Name</span>
-        <input name="display_name" autocomplete="username" placeholder="Murima 01" required>
+        <input name="display_name" placeholder="Murima 01" required>
       </label>
       <label class="full">
         <span>Contact</span>
-        <input name="contact" autocomplete="tel" placeholder="0712345678" required>
+        <input name="contact" placeholder="0712345678" required>
       </label>
       <button class="primary full" type="submit">Log in</button>
     </form>
